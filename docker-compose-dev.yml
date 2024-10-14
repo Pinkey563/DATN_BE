@@ -1,0 +1,39 @@
+version: '3.5'
+
+networks:
+  sign-school-network-dev:
+    driver: bridge
+
+volumes: # add this section
+  sign-school-pg-volume-dev:
+  sign-school-redis-volume-dev:
+
+services:
+  db:
+    container_name: sign-school-database-pg-dev
+    image: postgres:15.2
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - sign-school-network-dev
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - sign-school-pg-volume-dev:/var/lib/pg/data
+    ports:
+      - ${DB_PORT}:5432
+  redis:
+    container_name: sign-school-redis-dev
+    image: redis:7.2.4
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - sign-school-network-dev
+    volumes:
+      - sign-school-redis-volume-dev:/data
+    ports:
+      - ${REDIS_PORT}:6379
