@@ -1,12 +1,19 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
+import { AppStatus } from 'src/types/common';
 import { StringUtil } from 'src/utils/string';
-import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { ClassRoom } from '../class/classroom.entity';
 import { AbstractTimeEntity } from '../entity.interface';
+import { EXAM } from '../exam/exam.entity';
 import { Role } from '../role/role.entity';
 import { Upload } from '../upload/upload.entity';
+import { VocabularyView } from '../vocabulary/vocabulary-view.entity';
+import { Vocabulary } from '../vocabulary/vocabulary.entity';
+import { ExamAttempt } from './../exam/exam-attempt.entity';
 import { UserLog } from './user-log.entity';
-import { AppStatus } from 'src/types/common';
+import { Question } from '../question/question.entity';
+import { ClassStudent } from '../class/class-student.entity';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -94,6 +101,27 @@ export class User extends AbstractTimeEntity {
 
   @OneToMany(() => UserLog, (userLog) => userLog.user)
   userLogs: UserLog[];
+
+  @OneToMany(() => VocabularyView, (vocabularyView) => vocabularyView.student)
+  vocabularyViews: VocabularyView[];
+
+  @OneToMany(() => Vocabulary, (vocabulary) => vocabulary.creator)
+  vocabularies: Vocabulary[];
+
+  @OneToOne(() => ClassRoom, (vocabulary) => vocabulary.teacher)
+  classroomTeacher: ClassRoom;
+
+  @OneToMany(() => EXAM, (exam) => exam.creator)
+  exams: EXAM[];
+
+  @OneToMany(() => ExamAttempt, (examAttempt) => examAttempt.student)
+  examAttempts: ExamAttempt[];
+
+  @OneToMany(() => Question, (question) => question.creator)
+  questions: Question[];
+
+  @OneToMany(() => ClassStudent, (classStudent) => classStudent.student)
+  classStudents: ClassStudent[];
 
   @BeforeInsert()
   handleBeforeInsert() {
