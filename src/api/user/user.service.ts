@@ -38,10 +38,9 @@ export class UserService {
     const user = await User.findOne({
       select: {
         ...UserHelper.selectBasicInfo,
-        coverPhoto: true,
-        facebookUrl: true,
         createdAt: true,
         updatedAt: true,
+        status: true,
         role: {
           code: true,
         },
@@ -115,14 +114,6 @@ export class UserService {
       user.avatar = body.avatar;
     }
 
-    if (CondUtil.diffAndVail(body.coverPhoto, user.coverPhoto)) {
-      user.coverPhoto = body.coverPhoto;
-    }
-
-    if (CondUtil.diffAndVail(body.facebookUrl, user.facebookUrl)) {
-      user.facebookUrl = body.facebookUrl;
-    }
-
     const permission = await PermissionHelper.getPermissionByCode(permissionCode);
     if (!permission) throw new App404Exception('permissionCode', { permissionCode });
 
@@ -151,8 +142,8 @@ export class UserService {
     const [data, itemCount] = await User.findAndCount({
       select: {
         ...UserHelper.selectBasicInfo,
-        coverPhoto: true,
         isSupperAdmin: true,
+        status: true,
         createdAt: true,
         role: { code: true },
       },

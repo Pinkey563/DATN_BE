@@ -65,20 +65,6 @@ export class User extends AbstractTimeEntity {
   })
   phoneNumber: string;
 
-  @DBColumn({
-    name: 'cover_photo',
-    type: 'varchar',
-    nullable: true,
-  })
-  coverPhoto: string;
-
-  @DBColumn({
-    name: 'facebook_url',
-    type: 'varchar',
-    nullable: true,
-  })
-  facebookUrl: string;
-
   @DBColumn({ type: 'boolean', name: 'is_super_admin', default: false })
   isSupperAdmin: boolean;
 
