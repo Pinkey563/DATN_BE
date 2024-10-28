@@ -8,4 +8,10 @@ export class CondUtil {
       target[key] = value;
     }
   };
+
+  static saveIfChanged = (objVal, bodyVal, key: string[]) => {
+    key.forEach((k) => {
+      this.setIfExists(objVal, k, bodyVal[k]);
+    });
+  };
 }

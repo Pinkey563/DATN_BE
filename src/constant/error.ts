@@ -26,6 +26,7 @@ export enum ERROR_MSG {
   // SYSTEM LOGIC MESSAGE
   TIME_INVALID = 'TIME_INVALID',
   DATA_NOT_FOUND = 'DATA_NOT_FOUND',
+  PERMISSION_DENIED = 'PERMISSION_DENIED',
 }
 
 export const AppError: Record<ERROR_MSG, IAppError> = Object.freeze({
@@ -107,5 +108,11 @@ export const AppError: Record<ERROR_MSG, IAppError> = Object.freeze({
     code: 'DATA_NOT_FOUND',
     message: 'Data not found',
     status: HttpStatus.BAD_REQUEST,
+  },
+
+  [ERROR_MSG.PERMISSION_DENIED]: {
+    code: 'NOT_PERMISSION',
+    message: 'Only admin can do this action',
+    status: HttpStatus.FORBIDDEN,
   },
 });

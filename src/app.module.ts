@@ -11,6 +11,7 @@ import { ENV } from './config/environment';
 import { JobModule } from './job/job.module';
 import { winstonLogger } from './logger';
 import { RequestLogMiddleware } from './middleware/request-log.middleware';
+import { ClassroomModule } from './api/classroom/classroom.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { RequestLogMiddleware } from './middleware/request-log.middleware';
     AuthModule,
     UserModule,
     UploadModule,
+    ClassroomModule
   ],
   controllers: [],
   providers: [],

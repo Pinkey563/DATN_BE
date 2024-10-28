@@ -1,6 +1,6 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { BeforeUpdate, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { AbstractTimeEntity } from '../entity.interface';
 import { ClassStudent } from './class-student.entity';
 import { User } from '../user/user.entity';
@@ -8,6 +8,7 @@ import { Vocabulary } from '../vocabulary/vocabulary.entity';
 import { Question } from '../question/question.entity';
 import { AppStatus } from 'src/types/common';
 import { EXAM } from '../exam/exam.entity';
+import { StringUtil } from 'src/utils/string';
 
 @Entity(EntityNameConst.CLASSROOM)
 export class ClassRoom extends AbstractTimeEntity {
@@ -29,7 +30,7 @@ export class ClassRoom extends AbstractTimeEntity {
     type: 'int',
     nullable: true,
   })
-  teacherId: string;
+  teacherId: number;
 
   @DBColumn({
     name: 'description',
@@ -84,4 +85,9 @@ export class ClassRoom extends AbstractTimeEntity {
 
   @OneToMany(() => EXAM, (exam) => exam.classroom)
   exams: EXAM[];
+
+  @BeforeUpdate()
+  handleBeforeUpdate() {
+    this.slug = StringUtil.createSlug(this.name);
+  }
 }

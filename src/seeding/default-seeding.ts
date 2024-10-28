@@ -1,14 +1,17 @@
+import { ClassRoomAction } from 'src/api/classroom/classroom-permission.interface';
 import { UploadAction } from 'src/api/upload/upload-permission.interface';
 import { UserAction } from 'src/api/user/user.permission.interface';
 import { connectSource } from 'src/config/database.config';
 import { RoleCode } from 'src/constant/role-code';
-import { Permission } from 'src/entities/role/permission.entity';
 import { RolePermission } from 'src/entities/role/role-permission.entity';
 import { Role } from 'src/entities/role/role.entity';
+import { Token } from 'src/entities/token.entity';
 import { User } from 'src/entities/user/user.entity';
 import { RoleHelper } from 'src/helper/role-helper.service';
+import { Permission } from './../entities/role/permission.entity';
 import { PermissionData } from './data/permission-data';
 import { RoleData } from './data/role-data';
+import { TokenData } from './data/token-data';
 import {
   adminCodeServiceData,
   DefaultAdminData,
@@ -17,12 +20,24 @@ import {
   DefaultVolunteerData,
 } from './data/user-data';
 import { seedingEntity } from './seeding-utils';
-import { Token } from 'src/entities/token.entity';
-import { TokenData } from './data/token-data';
 
-const PermissionAdminRoleCode = [...Object.values(UserAction), ...Object.values(UploadAction)];
+const PermissionAdminRoleCode = [
+  ...Object.values(UserAction),
+  ...Object.values(UploadAction),
+  ...Object.values(ClassRoomAction),
+];
 
-const PermissionUserRoleCode = [UserAction.GetMyProfile, UserAction.UpdateMyProfile, UploadAction.File];
+const PermissionUserRoleCode = [
+  UserAction.GetMyProfile,
+  UserAction.UpdateMyProfile,
+  UploadAction.File,
+  UploadAction.Image,
+];
+
+const PermissionTeacherRoleCode = [
+  ...PermissionUserRoleCode,
+  ...Object.values(ClassRoomAction).filter((item) => item !== ClassRoomAction.APPROVE_CLASS),
+];
 
 const seedingRolePermission = async (permissionCodes, roleCode) => {
   console.log(`======== SEEDING ${RolePermission.name} =========`);
@@ -96,10 +111,10 @@ const defaultSeeding = async () => {
   );
 
   await seedingRolePermission(PermissionAdminRoleCode, RoleCode.ADMIN);
-  await seedingRolePermission(PermissionUserRoleCode, RoleCode.TEACHER);
+  await seedingRolePermission(PermissionTeacherRoleCode, RoleCode.TEACHER);
   await seedingRolePermission(PermissionUserRoleCode, RoleCode.STUDENT);
   await seedingRolePermission(PermissionUserRoleCode, RoleCode.VOLUNTEER);
-  await seedingRolePermission(PermissionUserRoleCode, RoleCode.ADMIN_CODE_SERVICE);
+  await seedingRolePermission(PermissionAdminRoleCode, RoleCode.ADMIN_CODE_SERVICE);
 
   process.exit(1);
 };
