@@ -9,7 +9,11 @@ export class UserHelper {
     id: true,
     username: true,
     name: true,
-    avatar: true,
+    email: true,
+    phoneNumber: true,
+    avatarLocation: true,
+    gender: true,
+    role: { code: true },
     slug: true,
   };
 
@@ -18,6 +22,7 @@ export class UserHelper {
     userWhere = {
       ...(q.name && { name: ILike(`%${q.name}%`) }),
       role: { code: Not(In([RoleCode.ADMIN, RoleCode.ADMIN_CODE_SERVICE])) },
+      ...(q.status && { status: q.status }),
     };
 
     return { ...userWhere };

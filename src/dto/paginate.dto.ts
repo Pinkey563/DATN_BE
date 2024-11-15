@@ -81,13 +81,13 @@ export class PageMetaDto {
 export class PageDto<T> {
   @IsArray()
   @ApiProperty({ isArray: true })
-  readonly data: T[];
+  readonly content: T[];
 
   @ApiProperty({ type: () => PageMetaDto })
   readonly meta: PageMetaDto;
 
   constructor(data: T[], meta: PageMetaDto) {
-    this.data = data;
+    this.content = data;
     this.meta = meta;
   }
 }

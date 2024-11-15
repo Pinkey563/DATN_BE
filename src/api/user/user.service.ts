@@ -9,7 +9,7 @@ import { PageDto } from 'src/dto/paginate.dto';
 import { LoginDto } from 'src/dto/user-dto/login.dto';
 import { RegisterDto } from 'src/dto/user-dto/register.dto';
 import { SearchUserDto } from 'src/dto/user-dto/search-user.dto';
-import { UpdateUserProfileDto } from 'src/dto/user-dto/update-user-profile.dto';
+import { ChangeUserPasswordDto, UpdateUserProfileDto } from 'src/dto/user-dto/update-user-profile.dto';
 import { Upload } from 'src/entities/upload/upload.entity';
 import { UserLog } from 'src/entities/user/user-log.entity';
 import { User } from 'src/entities/user/user.entity';
@@ -41,15 +41,18 @@ export class UserService {
         createdAt: true,
         updatedAt: true,
         status: true,
-        role: {
-          code: true,
-        },
+        address: true,
+        birthday: true,
       },
       where: { id: userId, role: { code: Not(RoleCode.ADMIN) }, ...whereCustom },
       relations: { role: true },
     });
     if (!user) throw new App404Exception('userId', { userId });
-    return user;
+    const userReturn = {
+      ...user,
+      role: user.role.code,
+    };
+    return userReturn;
   }
 
   async getProfile({ userId }: CacheUser) {
@@ -58,15 +61,15 @@ export class UserService {
 
   login = async (body: LoginDto) => {
     const user = await User.findOne({
-      where: { username: body.username },
-      select: ['id', 'username', 'password'],
+      where: { email: body.email },
+      select: ['id', 'email', 'password'],
     });
 
-    if (!user) throw new App404Exception('username', body);
+    if (!user) throw new App404Exception('email', body);
     const isPasswordMatch = body.password === HashUtil.aesDecrypt(user.password);
     if (!isPasswordMatch) throw new AppException(ERROR_MSG.PASSWORD_NOT_CORRECT);
 
-    const data = await HashUtil.signAccessToken(user.id, user.username, this.jwtService);
+    const data = await HashUtil.signAccessToken(user.id, user.email, this.jwtService);
 
     const cacheKeyAuth = GenerateUtil.keyAuth(data.payload);
 
@@ -103,15 +106,31 @@ export class UserService {
 
     const oldUser = JSON.stringify(user);
 
-    const uploadKeys = ['avatar', 'coverPhoto'];
+    const uploadKeys = ['avatarLocation'];
     const listOldPaths = ArrUtil.getOldPathEntityFromBody({ entity: user, body, uploadKeys });
 
     if (CondUtil.diffAndVail(body.name, user.name)) {
       user.name = body.name;
     }
 
-    if (CondUtil.diffAndVail(body.avatar, user.avatar)) {
-      user.avatar = body.avatar;
+    if (CondUtil.diffAndVail(body.avatarLocation, user.avatarLocation)) {
+      user.avatarLocation = body.avatarLocation;
+    }
+
+    if (CondUtil.diffAndVail(body.address, user.address)) {
+      user.address = body.address;
+    }
+
+    if (CondUtil.diffAndVail(body.birthday, user.birthday)) {
+      user.birthday = body.birthday;
+    }
+
+    if (CondUtil.diffAndVail(body.gender, user.gender)) {
+      user.gender = body.gender;
+    }
+
+    if (CondUtil.diffAndVail(body.phoneNumber, user.phoneNumber)) {
+      user.phoneNumber = body.phoneNumber;
     }
 
     const permission = await PermissionHelper.getPermissionByCode(permissionCode);
@@ -152,6 +171,31 @@ export class UserService {
       skip: query.skip,
       take: query.take,
     });
+
     return GenerateUtil.paginate({ data, itemCount, query });
+  };
+
+  approveUser = async (userId: number, id, permissionCode) => {
+    const user = await User.findOneBy({ id });
+    if (!user) throw new App404Exception('userId', { userId: id });
+    const isPermission = await PermissionHelper.isPermissionChange(userId, permissionCode);
+    if (!isPermission) throw new AppException(ERROR_MSG.PERMISSION_DENIED);
+    user.status = AppStatus.APPROVED;
+
+    await user.save();
+    return true;
+  };
+
+  changePassword = async ({ userId }: CacheUser, body: ChangeUserPasswordDto) => {
+    const user = await User.findOneBy({ id: userId });
+    if (!user) throw new App404Exception('userId', { userId });
+
+    const isMatch = await HashUtil.comparePassword(body.oldPassword, user.password);
+    if (!isMatch) throw new AppException(ERROR_MSG.PASSWORD_NOT_CORRECT);
+
+    if (body.newPassword !== body.confirmPassword) throw new AppException(ERROR_MSG.PASSWORD_NOT_MATCH);
+    user.password = HashUtil.aesEncrypt(body.newPassword);
+    await user.save();
+    return true;
   };
 }

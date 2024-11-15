@@ -14,6 +14,7 @@ import { ExamAttempt } from './../exam/exam-attempt.entity';
 import { UserLog } from './user-log.entity';
 import { Question } from '../question/question.entity';
 import { ClassStudent } from '../class/class-student.entity';
+import { Gender } from 'src/constant/enum-common';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -45,11 +46,11 @@ export class User extends AbstractTimeEntity {
   name: string;
 
   @DBColumn({
-    name: 'avatar',
+    name: 'avatar_location',
     type: 'varchar',
     nullable: true,
   })
-  avatar: string;
+  avatarLocation: string;
 
   @DBColumn({
     name: 'email',
@@ -64,6 +65,19 @@ export class User extends AbstractTimeEntity {
     nullable: true,
   })
   phoneNumber: string;
+
+  @DBColumn({
+    name: 'address',
+    type: 'varchar',
+    nullable: true,
+  })
+  address: string;
+
+  @DBColumn({ type: 'timestamptz', name: 'birthday', nullable: true })
+  birthday: string;
+
+  @DBColumn({ type: 'enum', name: 'gender', enum: Gender, default: Gender.MALE })
+  gender: Gender;
 
   @DBColumn({ type: 'boolean', name: 'is_super_admin', default: false })
   isSupperAdmin: boolean;

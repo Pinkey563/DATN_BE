@@ -22,6 +22,7 @@ export enum ERROR_MSG {
   EMAIL_EXISTED = 'EMAIL_EXISTED',
   ROLE_IS_NOT_EXIST = 'ROLE_IS_NOT_EXIST',
   UN_SUPPORTED_STATUS = 'UN_SUPPORTED_STATUS',
+  PASSWORD_NOT_MATCH = 'PASSWORD_NOT_MATCH',
 
   // SYSTEM LOGIC MESSAGE
   TIME_INVALID = 'TIME_INVALID',
@@ -77,6 +78,12 @@ export const AppError: Record<ERROR_MSG, IAppError> = Object.freeze({
   [ERROR_MSG.OLD_PASSWORD_NOT_CORRECT]: {
     code: 'OLD_PASSWORD_NOT_CORRECT',
     message: 'Old password not correct',
+    status: HttpStatus.BAD_REQUEST,
+  },
+
+  [ERROR_MSG.PASSWORD_NOT_MATCH]: {
+    code: 'PASSWORD_NOT_MATCH',
+    message: 'Password not match',
     status: HttpStatus.BAD_REQUEST,
   },
 

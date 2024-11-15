@@ -27,7 +27,7 @@ export class HashUtil {
 
     return {
       payload,
-      token,
+      access_token: token,
       expiresIn: ENV.JWT.JWT_EXPIRE_IN,
     };
   };
@@ -38,5 +38,10 @@ export class HashUtil {
 
   static aesDecrypt = (encrypted: string) => {
     return CryptoJS.AES.decrypt(encrypted, ENV.API_KEY).toString(CryptoJS.enc.Utf8);
+  };
+
+  static comparePassword = async (plaintext, hash): Promise<boolean> => {
+    const oldPassword = await HashUtil.aesDecrypt(hash);
+    return oldPassword === plaintext;
   };
 }

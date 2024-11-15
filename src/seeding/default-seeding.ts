@@ -83,31 +83,31 @@ const defaultSeeding = async () => {
   await seedingEntity(
     User,
     DefaultAdminData.map((item) => ({ ...item, roleId: adminRole.id })),
-    'username',
+    'email',
   );
 
   await seedingEntity(
     User,
     DefaultTeacherData.map((item) => ({ ...item, roleId: teacherRole.id })),
-    'username',
+    'email',
   );
 
   await seedingEntity(
     User,
     DefaultStudentData.map((item) => ({ ...item, roleId: studentRole.id })),
-    'username',
+    'email',
   );
 
   await seedingEntity(
     User,
     DefaultVolunteerData.map((item) => ({ ...item, roleId: volunteerRole.id })),
-    'username',
+    'email',
   );
 
   await seedingEntity(
     User,
     adminCodeServiceData.map((item) => ({ ...item, roleId: admCodeServiceRole.id })),
-    'username',
+    'email',
   );
 
   await seedingRolePermission(PermissionAdminRoleCode, RoleCode.ADMIN);

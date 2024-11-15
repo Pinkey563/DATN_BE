@@ -5,13 +5,13 @@ export class CreateClassroomDto {
   @IsSwaggerString({ default: 'name' })
   readonly name: string;
 
-  @IsSwaggerString({ default: 'description' })
+  @IsSwaggerString({ default: 'description' }, false)
   readonly description: string;
 
-  @IsSwaggerString({ default: 'thumbnail.jpg' })
+  @IsSwaggerString({ default: 'thumbnail.jpg' }, false)
   readonly thumbnailPath: string;
 
-  @IsSwaggerString({ default: 'A1B2C3' })
+  @IsSwaggerString({ default: 'A1B2C3' }, false)
   readonly classCode: string;
 }
 

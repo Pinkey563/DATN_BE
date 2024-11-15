@@ -2,18 +2,18 @@ import { User } from 'src/entities/user/user.entity';
 
 export const DefaultAdminData: Partial<User>[] = [
   {
-    username: 'tunghust38',
+    email: 'tunghust38@gmail.com',
     password: 'U2FsdGVkX1/l8FZ79Hb0toPjDVDRk0LTAlNFFntINaw=',
     name: 'Tran Thanh Tung',
     isSupperAdmin: true,
   },
   {
-    username: 'dev_admin',
+    email: 'dev_admin@gmail.com',
     password: 'U2FsdGVkX1/l8FZ79Hb0toPjDVDRk0LTAlNFFntINaw=',
     name: 'Dev Admin',
   },
   {
-    username: 'test_admin',
+    email: 'test_admin@gmail.com',
     password: 'U2FsdGVkX1/l8FZ79Hb0toPjDVDRk0LTAlNFFntINaw=',
     name: 'Test Admin',
   },
@@ -21,12 +21,12 @@ export const DefaultAdminData: Partial<User>[] = [
 
 export const DefaultTeacherData: Partial<User>[] = [
   {
-    username: 'dev_teacher',
+    email: 'dev_teacher@gmail.com',
     password: 'U2FsdGVkX1/l8FZ79Hb0toPjDVDRk0LTAlNFFntINaw=',
     name: 'Dev Teacher',
   },
   {
-    username: 'test_teacher',
+    email: 'test_teacher@gmail.com',
     password: 'U2FsdGVkX1/l8FZ79Hb0toPjDVDRk0LTAlNFFntINaw=',
     name: 'Test Teacher',
   },
@@ -34,12 +34,12 @@ export const DefaultTeacherData: Partial<User>[] = [
 
 export const DefaultStudentData: Partial<User>[] = [
   {
-    username: 'dev_student',
+    email: 'dev_student@gmail.com',
     password: 'U2FsdGVkX1/l8FZ79Hb0toPjDVDRk0LTAlNFFntINaw=',
     name: 'Dev Student',
   },
   {
-    username: 'test_student',
+    email: 'test_student@gmail.com',
     password: 'U2FsdGVkX1/l8FZ79Hb0toPjDVDRk0LTAlNFFntINaw=',
     name: 'Test Student',
   },
@@ -47,12 +47,12 @@ export const DefaultStudentData: Partial<User>[] = [
 
 export const DefaultVolunteerData: Partial<User>[] = [
   {
-    username: 'dev_volunteer',
+    email: 'dev_volunteer@gmail.com',
     password: 'U2FsdGVkX1/l8FZ79Hb0toPjDVDRk0LTAlNFFntINaw=',
     name: 'Dev Volunteer',
   },
   {
-    username: 'test_volunteer',
+    email: 'test_volunteer@gmail.com',
     password: 'U2FsdGVkX1/l8FZ79Hb0toPjDVDRk0LTAlNFFntINaw=',
     name: 'Test Volunteer',
   },
@@ -60,7 +60,7 @@ export const DefaultVolunteerData: Partial<User>[] = [
 
 export const adminCodeServiceData: Partial<User>[] = [
   {
-    username: 'admin_code_service',
+    email: 'admin_code_service@gmail.com',
     password: 'U2FsdGVkX1/l8FZ79Hb0toPjDVDRk0LTAlNFFntINaw=',
     name: 'Code Server Admin',
   },
