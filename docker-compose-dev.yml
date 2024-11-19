@@ -7,6 +7,7 @@ networks:
 volumes: # add this section
   sign-school-pg-volume-dev:
   sign-school-redis-volume-dev:
+  sign-school-minio-volume-dev:
 
 services:
   db:
@@ -37,3 +38,20 @@ services:
       - sign-school-redis-volume-dev:/data
     ports:
       - ${REDIS_PORT}:6379
+  minio:
+    container_name: sign-school-minio-dev
+    image: minio/minio:latest
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - sign-school-network-dev
+    environment:
+      MINIO_ROOT_USER: ${API_KEY} # Access key
+      MINIO_ROOT_PASSWORD: ${API_SECRET} # Secret key
+    volumes:
+      - sign-school-minio-volume-dev:/data # Volume để lưu trữ dữ liệu
+    ports:
+      - ${MINIO_PORT}:${MINIO_PORT}
+      - ${MINIO_CONSOLE}:${MINIO_CONSOLE}
+    command: server --console-address ":9001" /data # Lệnh khởi động MinIO server với thư mục /data

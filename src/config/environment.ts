@@ -7,6 +7,7 @@ export const ENV = {
   PORT: process.env.PORT,
   TIME_ZONE: process.env.TIME_ZONE,
   API_KEY: process.env.API_KEY,
+  API_SECRET: process.env.API_SECRET,
   DATABASE: {
     DB_TYPE: process.env.DB_TYPE,
     DB_HOST: process.env.DB_HOST,
@@ -35,6 +36,10 @@ export const ENV = {
     CRON_CLEAN_STORAGE_EXPRESSION: process.env.CRON_CLEAN_STORAGE_EXPRESSION,
     CRON_BACKUP_DATABASE_EXPRESSION: process.env.CRON_BACKUP_DATABASE_EXPRESSION,
     CLEAN_STORAGE_THRESHOLD_SECOND: Number(process.env.CLEAN_STORAGE_THRESHOLD_SECOND),
+  },
+  MINIO: {
+    MINIO_HOST: process.env.MINIO_HOST,
+    MINIO_PORT: Number(process.env.MINIO_PORT),
   },
 };
 
