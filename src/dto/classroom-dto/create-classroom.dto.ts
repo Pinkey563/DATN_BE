@@ -1,4 +1,5 @@
-import { IsSwaggerEnum, IsSwaggerString } from 'src/decorator/swagger.decorator';
+import { IsSwaggerEnum, IsSwaggerNumber, IsSwaggerString } from 'src/decorator/swagger.decorator';
+import { ClassLevel } from 'src/types/classroom';
 import { AppStatus } from 'src/types/common';
 
 export class CreateClassroomDto {
@@ -13,6 +14,12 @@ export class CreateClassroomDto {
 
   @IsSwaggerString({ default: 'A1B2C3' }, false)
   readonly classCode: string;
+
+  @IsSwaggerEnum({ enum: ClassLevel })
+  readonly classLevel: ClassLevel;
+
+  @IsSwaggerNumber({})
+  readonly teacherId: number;
 }
 
 export class UpdateClassroomDto {

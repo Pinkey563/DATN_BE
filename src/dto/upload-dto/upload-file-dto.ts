@@ -9,7 +9,7 @@ export class UploadFileDto {
     required: false,
     isArray: true,
   })
-  readonly uploadFiles: Express.Multer.File[];
+  readonly file: Express.Multer.File[];
 
   @IsSwaggerEnum({ enum: UploadFileType }, false)
   readonly type: UploadFileType;
@@ -22,7 +22,7 @@ export class UploadImageDto {
     required: false,
     isArray: true,
   })
-  readonly uploadFiles: Express.Multer.File[];
+  readonly file: Express.Multer.File[];
 
   @IsSwaggerEnum({ enum: UploadImageType }, false)
   readonly type?: UploadImageType;

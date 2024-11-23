@@ -21,11 +21,11 @@ export class UploadPermissionController implements Record<UploadAction, any> {
         fileIsRequired: true,
       }),
     )
-    { uploadFiles },
+    { file },
     @Request() req: RequestAuth,
     @Body() body: UploadFileDto,
   ) {
-    return this.uploadService.uploadFile(req.user.userId, body, uploadFiles[0]);
+    return this.uploadService.uploadFile(req.user.userId, body, file[0]);
   }
 
   @Post('/image')
@@ -37,10 +37,10 @@ export class UploadPermissionController implements Record<UploadAction, any> {
         fileIsRequired: true,
       }),
     )
-    { uploadFiles },
+    { file },
     @Request() req: RequestAuth,
     @Body() body: UploadImageDto,
   ) {
-    return this.uploadService.uploadImage(req.user.userId, body, uploadFiles[0]);
+    return this.uploadService.uploadImage(req.user.userId, body, file[0]);
   }
 }

@@ -6,6 +6,8 @@ export enum ClassRoomAction {
   LEAVE_CLASS = 'classroom__LeaveClass',
   UPDATE_CLASS = 'classroom__UpdateClass',
   APPROVE_CLASS = 'classroom__ApproveClass',
+  DELETE_CLASS = 'classroom__DeleteClass',
+  GET_ALL_STUDENT = 'classroom__GetAllStudent',
 }
 
 export const ClassRoomSummary: Record<keyof typeof ClassRoomAction, string> = {
@@ -14,6 +16,8 @@ export const ClassRoomSummary: Record<keyof typeof ClassRoomAction, string> = {
   LEAVE_CLASS: 'Leave a class',
   UPDATE_CLASS: 'Update a class',
   APPROVE_CLASS: 'Approve a class',
+  DELETE_CLASS: 'Delete a class',
+  GET_ALL_STUDENT: 'Get all student in class',
 };
 
 export const ClassRoomPermission: Partial<Permission>[] = Object.keys(ClassRoomAction).map((key) => ({

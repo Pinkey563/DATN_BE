@@ -59,4 +59,7 @@ export class DateUtil {
 
     return dateList;
   };
+
+  static getTimeFuture = (date, hour = 0, minute = 0, second = 0) =>
+    dayjs(date).add(hour, 'hour').add(minute, 'minute').add(second, 'second').toISOString();
 }

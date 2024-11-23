@@ -9,6 +9,7 @@ import { Question } from '../question/question.entity';
 import { AppStatus } from 'src/types/common';
 import { EXAM } from '../exam/exam.entity';
 import { StringUtil } from 'src/utils/string';
+import { ClassLevel } from 'src/types/classroom';
 
 @Entity(EntityNameConst.CLASSROOM)
 export class ClassRoom extends AbstractTimeEntity {
@@ -67,6 +68,13 @@ export class ClassRoom extends AbstractTimeEntity {
     nullable: true,
   })
   slug: string;
+
+  @DBColumn({
+    name: 'class_level',
+    type: 'enum',
+    enum: ClassLevel,
+  })
+  classLevel: ClassLevel;
 
   // RELATIONSHIP
 

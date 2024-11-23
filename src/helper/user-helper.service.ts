@@ -1,8 +1,7 @@
-import { RoleCode } from 'src/constant/role-code';
 import { SearchUserDto } from 'src/dto/user-dto/search-user.dto';
 import { User } from 'src/entities/user/user.entity';
 import { ConditionWhere } from 'src/types/query.type';
-import { FindOptionsSelect, ILike, In, Not } from 'typeorm';
+import { FindOptionsSelect, ILike } from 'typeorm';
 
 export class UserHelper {
   static selectBasicInfo: FindOptionsSelect<User> = {
@@ -21,10 +20,16 @@ export class UserHelper {
     let userWhere: ConditionWhere<User> = {};
     userWhere = {
       ...(q.name && { name: ILike(`%${q.name}%`) }),
-      role: { code: Not(In([RoleCode.ADMIN, RoleCode.ADMIN_CODE_SERVICE])) },
+      role: { code: q.roleCode },
       ...(q.status && { status: q.status }),
     };
 
     return { ...userWhere };
   };
+
+  static generateStudentCode(studentId: number) {
+    const year = new Date().getFullYear();
+    const studentCode = `${year}${studentId.toString().padStart(4, '0')}`;
+    return studentCode;
+  }
 }

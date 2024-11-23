@@ -9,11 +9,11 @@ export function UploadImageFormData({ maxCount = 1 }) {
   return applyDecorators(
     ApiConsumes('multipart/form-data'),
     UseInterceptors(
-      FileFieldsInterceptor([{ name: 'uploadFiles', maxCount: maxCount }], {
+      FileFieldsInterceptor([{ name: 'file', maxCount: maxCount }], {
         fileFilter: (_req, file, cb) => {
           if (file.originalname.toLocaleLowerCase().match(/^.*\.(jpg|webp|png|jpeg|heic)$/)) cb(null, true);
           else {
-            cb(new MulterError('LIMIT_UNEXPECTED_FILE', 'uploadFiles'), false);
+            cb(new MulterError('LIMIT_UNEXPECTED_FILE', 'file'), false);
           }
         },
         limits: { fileSize: FileUtils.genMBToBytes(UploadConst.maxFileImageSize) },
@@ -26,7 +26,7 @@ export function UploadFileFormData({ maxCount = 1 }) {
   return applyDecorators(
     ApiConsumes('multipart/form-data'),
     UseInterceptors(
-      FileFieldsInterceptor([{ name: 'uploadFiles', maxCount: maxCount }], {
+      FileFieldsInterceptor([{ name: 'file', maxCount: maxCount }], {
         limits: { fileSize: FileUtils.genMBToBytes(UploadConst.maxFileImageSize) },
       }),
     ),

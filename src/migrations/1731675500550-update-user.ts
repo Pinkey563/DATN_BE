@@ -24,6 +24,6 @@ export class UpdateUser1731675500550 implements MigrationInterface {
       'avatar_location',
       new TableColumn(MigrationConst.charColumn('avatar', { isNullable: true })),
     );
-    await queryRunner.dropColumns(EntityNameConst.USER, ['address', 'birthday']);
+    await queryRunner.dropColumns(EntityNameConst.USER, ['address', 'birthday', 'gender']);
   }
 }

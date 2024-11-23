@@ -7,7 +7,7 @@ import { LoginDto } from 'src/dto/user-dto/login.dto';
 import { SearchUserDto } from 'src/dto/user-dto/search-user.dto';
 import { User } from 'src/entities/user/user.entity';
 import { UserService } from './user.service';
-import { RegisterDto } from 'src/dto/user-dto/register.dto';
+import { RegisterDto, VerifyEmailDto } from 'src/dto/user-dto/register.dto';
 
 @IsAuthController(EntityNameConst.USER, false)
 export class UserController {
@@ -30,6 +30,7 @@ export class UserController {
   async search(@Query() query: SearchUserDto) {
     return await this.userService.search(query);
   }
+
   @Get('/:id')
   @ApiHandleResponse({
     summary: 'Get user info by id',
@@ -46,5 +47,10 @@ export class UserController {
   })
   async register(@Body() body: RegisterDto) {
     return await this.userService.register(body);
+  }
+
+  @Post('/register/verify-otp')
+  async verify(@Body() body: VerifyEmailDto): Promise<string> {
+    return this.userService.verify(body.email, body.otpNum);
   }
 }

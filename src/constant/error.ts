@@ -13,6 +13,8 @@ export enum ERROR_MSG {
   AUTH_TOKEN_EXPIRED = 'AUTH_TOKEN_EXPIRED',
   AUTH_TOKEN_INVALID = 'AUTH_TOKEN_INVALID',
   AUTH_FORBIDDEN_ACCOUNT = 'AUTH_FORBIDDEN_ACCOUNT',
+  AUTH_OTP_NOT_MATCH = 'AUTH_OTP_NOT_MATCH',
+  AUTH_OTP_EXPIRED = 'AUTH_OTP_EXPIRED',
 
   // LOGIC DEFAULT MESSAGE
   PASSWORD_NOT_CORRECT = 'PASSWORD_NOT_CORRECT',
@@ -43,6 +45,16 @@ export const AppError: Record<ERROR_MSG, IAppError> = Object.freeze({
     status: HttpStatus.BAD_REQUEST,
   },
   //AUTH
+  [ERROR_MSG.AUTH_OTP_EXPIRED]: {
+    code: ERROR_MSG.AUTH_OTP_EXPIRED,
+    message: 'OTP have been expired',
+    status: HttpStatus.BAD_REQUEST,
+  },
+  [ERROR_MSG.AUTH_OTP_NOT_MATCH]: {
+    code: ERROR_MSG.AUTH_OTP_NOT_MATCH,
+    message: 'OTP not match',
+    status: HttpStatus.BAD_REQUEST,
+  },
   [ERROR_MSG.AUTH_TOKEN_CLAIMS_BEFORE]: {
     code: ERROR_MSG.AUTH_TOKEN_CLAIMS_BEFORE,
     message: 'Your token has been claims before create',

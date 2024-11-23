@@ -15,6 +15,7 @@ import { UserLog } from './user-log.entity';
 import { Question } from '../question/question.entity';
 import { ClassStudent } from '../class/class-student.entity';
 import { Gender } from 'src/constant/enum-common';
+import { StudentProfile } from './student-profile.entity';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -122,6 +123,9 @@ export class User extends AbstractTimeEntity {
 
   @OneToMany(() => ClassStudent, (classStudent) => classStudent.student)
   classStudents: ClassStudent[];
+
+  @OneToOne(() => StudentProfile, (studentProfile) => studentProfile.user)
+  studentProfile: StudentProfile;
 
   @BeforeInsert()
   handleBeforeInsert() {

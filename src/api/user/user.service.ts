@@ -20,11 +20,14 @@ import { App404Exception, AppException, AppExistedException } from 'src/middlewa
 import { AppStatus } from 'src/types/common';
 import { ArrUtil } from 'src/utils/array';
 import { CondUtil } from 'src/utils/condition';
+import { DateUtil } from 'src/utils/date';
 import { GenerateUtil } from 'src/utils/generate';
 import { HashUtil } from 'src/utils/hash';
 import { HelperUtils } from 'src/utils/helpers';
 import { QueryUtil } from 'src/utils/query';
 import { DataSource, FindOptionsWhere, Not } from 'typeorm';
+import { StudentProfile } from './../../entities/user/student-profile.entity';
+import { MailService } from './MailService';
 
 @Injectable()
 export class UserService {
@@ -32,6 +35,7 @@ export class UserService {
     private readonly jwtService: JwtService,
     @Inject(CACHE_MANAGER) private cacheManager: CacheStore,
     private dataSource: DataSource,
+    private readonly mailService: MailService, // Service gửi email
   ) {}
 
   async getProfileById(userId, whereCustom: FindOptionsWhere<User> = {}) {
@@ -79,26 +83,69 @@ export class UserService {
   };
 
   register = async (body: RegisterDto) => {
-    const isExistByName = await HelperUtils.existByName(User, body.username, 'username');
-    if (isExistByName) throw new AppExistedException('username', body);
+    const isExistByName = await HelperUtils.existByName(User, body.email, 'email');
+    if (isExistByName) throw new AppExistedException('email', body);
 
-    const role = await RoleHelper.getRoleByCode(body.roleCode);
-    if (!role || role.code === RoleCode.ADMIN) throw new App404Exception('roleCode', body);
+    const role = await RoleHelper.getRoleByCode(body.role);
+    if (!role || role.code === RoleCode.ADMIN) throw new App404Exception('role', body);
+
+    const otp = Math.floor(100000 + Math.random() * 900000);
+    const expiry = DateUtil.getTimeFuture(new Date(), 0, 2, 0); // Thời gian hết hạn dayjs().add(10, 'minute').toISOString();
+
+    const userCacheKey = `user:${body.email}`;
+
+    const bodyCache = {
+      ...body,
+      role,
+    };
+
+    await this.cacheManager.set(userCacheKey, JSON.stringify({ body: bodyCache, otp, expiry }), { ttl: 10 * 60 });
+
+    await this.mailService.sendMail(body.email, 'Your OTP Code', `Your OTP is: ${otp}`);
+
+    return true;
+  };
+
+  async verify(email: string, otpNum: number): Promise<string> {
+    const userCacheKey = `user:${email}`;
+    const cachedData: any = await this.cacheManager.get(userCacheKey);
+
+    if (!cachedData) throw new AppException(ERROR_MSG.AUTH_OTP_EXPIRED);
+    // ;
+
+    const { body, otp: cachedOtp, expiry } = JSON.parse(cachedData as string);
+
+    if (DateUtil.isAfterOrEqual(new Date(), new Date(expiry))) throw new Error('OTP expired.');
+    if (cachedOtp !== otpNum) throw new AppException(ERROR_MSG.AUTH_OTP_NOT_MATCH);
+
+    // Lưu vào cơ sở dữ liệu (ví dụ dùng TypeORM)
 
     const user = new User();
-    if (role.code !== RoleCode.STUDENT) {
+    if (body.role.code == RoleCode.TEACHER) {
       user.status = AppStatus.PENDING;
     }
     user.username = body.username;
+    user.name = body.name;
     user.password = HashUtil.aesEncrypt(body.password);
     user.email = body.email;
     user.phoneNumber = body.phoneNumber;
 
-    user.roleId = role.id;
+    user.roleId = body.role.id;
 
     await user.save();
-    return true;
-  };
+
+    if (body.role.code === RoleCode.STUDENT) {
+      const studentCode = UserHelper.generateStudentCode(user.id);
+      const studentProfile = new StudentProfile();
+      studentProfile.studentCode = studentCode;
+      studentProfile.userId = user.id;
+      await studentProfile.save();
+    }
+    // Xóa Redis sau khi xác minh thành công
+    await this.cacheManager.del(userCacheKey);
+
+    return 'Verify successfully';
+  }
 
   updateProfile = async ({ userId }: CacheUser, body: UpdateUserProfileDto, permissionCode: string): Promise<any> => {
     const user = await User.findOneBy({ id: userId });
