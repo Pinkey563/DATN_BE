@@ -7,7 +7,6 @@ import { PermissionHelper } from 'src/helper/permisson-helper.service';
 import { App404Exception, AppException, AppExistedException } from 'src/middleware/app-error-handler';
 import { HelperUtils } from 'src/utils/helpers';
 import { DataSource } from 'typeorm';
-import { ClassRoomAction } from './classroom-permission.interface';
 import { CacheUser } from 'src/dto/common-request.dto';
 import { CondUtil } from 'src/utils/condition';
 import { ERROR_MSG } from 'src/constant/error';
@@ -18,10 +17,10 @@ import { ClassroomHelper } from 'src/helper/classroom-helper.service';
 import { QueryUtil } from 'src/utils/query';
 import { GenerateUtil } from 'src/utils/generate';
 import { User } from 'src/entities/user/user.entity';
-import { AppStatus } from 'src/types/common';
+import { ClassRoomAction } from '../classroom/classroom-permission.interface';
 
 @Injectable()
-export class ClassroomService {
+export class VocabularyService {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   search = async (query: SearchClassroomDto): Promise<PageDto<ClassRoom>> => {
@@ -166,39 +165,5 @@ export class ClassroomService {
 
     await classroom.remove();
     return classroom;
-  };
-
-  joinClass = async (id: number, user: CacheUser, body, permissionCode): Promise<any> => {
-    const classroom = await ClassRoom.findOne({ where: { id, status: AppStatus.APPROVED } });
-    if (!classroom) throw new App404Exception('id', { id });
-
-    const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
-    if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
-
-    const student = await User.findOne({ where: { studentProfile: { studentCode: body.studentCode } } });
-    if (!student) throw new App404Exception('userId', { userId: body.studentCode });
-
-    const classStudent = new ClassStudent();
-
-    classStudent.classroomId = classroom.id;
-    classStudent.studentId = student.id;
-
-    await classStudent.save();
-    return true;
-  };
-
-  leaveClass = async (id: number, user: CacheUser, body, permissionCode): Promise<any> => {
-    const classroom = await ClassRoom.findOne({ where: { id } });
-    if (!classroom) throw new App404Exception('id', { id });
-
-    const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
-    if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
-
-    const student = await User.findOne({ where: { studentProfile: { studentCode: body.studentCode } } });
-    const classStudent = await ClassStudent.findOne({ where: { classroomId: classroom.id, studentId: student.id } });
-    if (!classStudent) throw new App404Exception('studentId', { studentId: body.studentId });
-
-    await classStudent.remove();
-    return true;
   };
 }

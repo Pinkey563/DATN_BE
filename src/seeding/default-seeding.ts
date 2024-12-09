@@ -20,11 +20,13 @@ import {
   DefaultVolunteerData,
 } from './data/user-data';
 import { seedingEntity } from './seeding-utils';
+import { VocabularyAction } from 'src/api/vocabulary/vocabulary.permission.interface';
 
 const PermissionAdminRoleCode = [
   ...Object.values(UserAction),
   ...Object.values(UploadAction),
   ...Object.values(ClassRoomAction),
+  ...Object.values(VocabularyAction),
 ];
 
 const PermissionUserRoleCode = [
@@ -37,6 +39,12 @@ const PermissionUserRoleCode = [
 const PermissionTeacherRoleCode = [
   ...PermissionUserRoleCode,
   ...Object.values(ClassRoomAction).filter((item) => item !== ClassRoomAction.APPROVE_CLASS),
+  ...Object.values(VocabularyAction),
+];
+
+const PermissionVolunteerRoleCode = [
+  ...PermissionUserRoleCode,
+  ...Object.values(VocabularyAction).filter((item) => item !== VocabularyAction.Approve_Vocabulary),
 ];
 
 const seedingRolePermission = async (permissionCodes, roleCode) => {
@@ -115,6 +123,7 @@ const defaultSeeding = async () => {
   await seedingRolePermission(PermissionUserRoleCode, RoleCode.STUDENT);
   await seedingRolePermission(PermissionUserRoleCode, RoleCode.VOLUNTEER);
   await seedingRolePermission(PermissionAdminRoleCode, RoleCode.ADMIN_CODE_SERVICE);
+  await seedingRolePermission(PermissionVolunteerRoleCode, RoleCode.VOLUNTEER);
 
   process.exit(1);
 };

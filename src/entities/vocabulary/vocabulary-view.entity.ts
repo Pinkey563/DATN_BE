@@ -8,16 +8,29 @@ import { Vocabulary } from './vocabulary.entity';
 @Entity(EntityNameConst.VOCABULARY_VIEW)
 export class VocabularyView extends AbstractCreatedIdEntity {
   @DBColumn({
-    name: 'student_id',
+    name: 'user_id',
     type: 'int',
   })
-  studentId: string;
+  userId: number;
 
   @DBColumn({
     name: 'vocabulary_id',
     type: 'int',
   })
-  vocabularyId: string;
+  vocabularyId: number;
+
+  @DBColumn({
+    name: 'last_viewed_at',
+    type: 'timestamptz',
+  })
+  lastViewedAt: string;
+
+  @DBColumn({
+    name: 'view_count',
+    type: 'int',
+    default: 0,
+  })
+  viewCount: number;
 
   // RELATIONSHIP
 
@@ -26,6 +39,6 @@ export class VocabularyView extends AbstractCreatedIdEntity {
   vocabulary: Vocabulary;
 
   @ManyToOne(() => User, (user) => user.vocabularyViews, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'student_id' })
-  student: User;
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }

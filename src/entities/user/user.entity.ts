@@ -103,7 +103,7 @@ export class User extends AbstractTimeEntity {
   @OneToMany(() => UserLog, (userLog) => userLog.user)
   userLogs: UserLog[];
 
-  @OneToMany(() => VocabularyView, (vocabularyView) => vocabularyView.student)
+  @OneToMany(() => VocabularyView, (vocabularyView) => vocabularyView.user)
   vocabularyViews: VocabularyView[];
 
   @OneToMany(() => Vocabulary, (vocabulary) => vocabulary.creator)

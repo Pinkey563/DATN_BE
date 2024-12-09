@@ -28,6 +28,8 @@ import { QueryUtil } from 'src/utils/query';
 import { DataSource, FindOptionsWhere, Not } from 'typeorm';
 import { StudentProfile } from './../../entities/user/student-profile.entity';
 import { MailService } from './MailService';
+import { Vocabulary } from 'src/entities/vocabulary/vocabulary.entity';
+import { VocabularyView } from 'src/entities/vocabulary/vocabulary-view.entity';
 
 @Injectable()
 export class UserService {
@@ -214,6 +216,13 @@ export class UserService {
         role: { code: true },
       },
       where: UserHelper.getFilterSearchUser(query),
+      relations: {
+        role: true,
+        classStudents: {
+          classroom: true,
+        },
+      },
+
       order: QueryUtil.getSort(query.orderBy, query.sortBy),
       skip: query.skip,
       take: query.take,
@@ -244,5 +253,28 @@ export class UserService {
     user.password = HashUtil.aesEncrypt(body.newPassword);
     await user.save();
     return true;
+  };
+
+  viewVocabulary = async (userId: number, id: number) => {
+    const vocabulary = await Vocabulary.findOne({ where: { id } });
+    if (!vocabulary) throw new App404Exception('id', { id });
+
+    let vocabularyView = await VocabularyView.findOne({
+      where: {
+        vocabularyId: id,
+        userId,
+      },
+    });
+
+    if (!vocabularyView) {
+      vocabularyView = new VocabularyView();
+      vocabularyView.vocabularyId = vocabulary.id;
+      vocabularyView.userId = userId;
+      vocabularyView.viewCount = 0;
+    }
+
+    vocabularyView.lastViewedAt = new Date().toISOString();
+    vocabularyView.viewCount = vocabularyView.viewCount + 1;
+    await vocabularyView.save();
   };
 }

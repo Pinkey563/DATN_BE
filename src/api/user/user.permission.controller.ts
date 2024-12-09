@@ -1,4 +1,4 @@
-import { Body, Get, Param, Put, Req } from '@nestjs/common';
+import { Body, Get, Param, Post, Put, Req } from '@nestjs/common';
 import { EntityNameConst } from 'src/constant/entity-name';
 import { ApiHandleResponse } from 'src/decorator/api.decorator';
 import { IsAuthController } from 'src/decorator/auth.decorator';
@@ -7,6 +7,7 @@ import { ChangeUserPasswordDto, UpdateUserProfileDto } from 'src/dto/user-dto/up
 import { User } from 'src/entities/user/user.entity';
 import { UserAction, UserSummary } from './user.permission.interface';
 import { UserService } from './user.service';
+import { VocabularyView } from 'src/entities/vocabulary/vocabulary-view.entity';
 
 @IsAuthController(`${EntityNameConst.USER}`, true)
 export class UserPermissionController implements Record<UserAction, any> {
@@ -34,5 +35,11 @@ export class UserPermissionController implements Record<UserAction, any> {
   @ApiHandleResponse({ type: User, summary: UserSummary.ChangePassword })
   async [UserAction.ChangePassword](@Req() req: RequestAuth, @Body() body: ChangeUserPasswordDto) {
     return await this.userService.changePassword(req.user, body);
+  }
+
+  @Post('/vocabulary/view/:id')
+  @ApiHandleResponse({ type: VocabularyView, summary: 'add vocabulary view' })
+  async viewVocabulary(@Req() req: RequestAuth, @Param('id') id: number) {
+    return await this.userService.viewVocabulary(req.user.userId, id);
   }
 }

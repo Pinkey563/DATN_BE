@@ -12,6 +12,7 @@ import { JobModule } from './job/job.module';
 import { winstonLogger } from './logger';
 import { RequestLogMiddleware } from './middleware/request-log.middleware';
 import { ClassroomModule } from './api/classroom/classroom.module';
+import { VocabularyModule } from './api/vocabulary/vocabulary.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { ClassroomModule } from './api/classroom/classroom.module';
     AuthModule,
     UserModule,
     UploadModule,
-    ClassroomModule
+    ClassroomModule,
+    VocabularyModule,
   ],
   controllers: [],
   providers: [],
