@@ -16,6 +16,7 @@ import { Question } from '../question/question.entity';
 import { ClassStudent } from '../class/class-student.entity';
 import { Gender } from 'src/constant/enum-common';
 import { StudentProfile } from './student-profile.entity';
+import { Topic } from '../vocabulary/topic.entity';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -126,6 +127,9 @@ export class User extends AbstractTimeEntity {
 
   @OneToOne(() => StudentProfile, (studentProfile) => studentProfile.user)
   studentProfile: StudentProfile;
+
+  @OneToMany(() => Topic, (topic) => topic.creator)
+  topics: Topic[];
 
   @BeforeInsert()
   handleBeforeInsert() {

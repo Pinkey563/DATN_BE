@@ -13,6 +13,7 @@ import { winstonLogger } from './logger';
 import { RequestLogMiddleware } from './middleware/request-log.middleware';
 import { ClassroomModule } from './api/classroom/classroom.module';
 import { VocabularyModule } from './api/vocabulary/vocabulary.module';
+import { TopicModule } from './api/topic/topic.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { VocabularyModule } from './api/vocabulary/vocabulary.module';
     UploadModule,
     ClassroomModule,
     VocabularyModule,
+    TopicModule,
   ],
   controllers: [],
   providers: [],

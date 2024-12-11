@@ -10,6 +10,7 @@ import { AppStatus } from 'src/types/common';
 import { EXAM } from '../exam/exam.entity';
 import { StringUtil } from 'src/utils/string';
 import { ClassLevel } from 'src/types/classroom';
+import { Topic } from '../vocabulary/topic.entity';
 
 @Entity(EntityNameConst.CLASSROOM)
 export class ClassRoom extends AbstractTimeEntity {
@@ -93,6 +94,9 @@ export class ClassRoom extends AbstractTimeEntity {
 
   @OneToMany(() => EXAM, (exam) => exam.classroom)
   exams: EXAM[];
+
+  @OneToMany(() => Topic, (topic) => topic.classroom)
+  topics: Topic[];
 
   @BeforeUpdate()
   handleBeforeUpdate() {

@@ -21,12 +21,14 @@ import {
 } from './data/user-data';
 import { seedingEntity } from './seeding-utils';
 import { VocabularyAction } from 'src/api/vocabulary/vocabulary.permission.interface';
+import { TopicAction } from 'src/api/topic/Topic-permission.interface';
 
 const PermissionAdminRoleCode = [
   ...Object.values(UserAction),
   ...Object.values(UploadAction),
   ...Object.values(ClassRoomAction),
   ...Object.values(VocabularyAction),
+  ...Object.values(TopicAction),
 ];
 
 const PermissionUserRoleCode = [
@@ -40,6 +42,7 @@ const PermissionTeacherRoleCode = [
   ...PermissionUserRoleCode,
   ...Object.values(ClassRoomAction).filter((item) => item !== ClassRoomAction.APPROVE_CLASS),
   ...Object.values(VocabularyAction),
+  ...Object.values(TopicAction),
 ];
 
 const PermissionVolunteerRoleCode = [
