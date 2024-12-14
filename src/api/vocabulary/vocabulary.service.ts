@@ -1,48 +1,48 @@
-import { ClassStudent } from './../../entities/class/class-student.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
-import { CreateClassroomDto, UpdateClassroomDto } from 'src/dto/classroom-dto/create-classroom.dto';
-import { ClassRoom } from 'src/entities/class/classroom.entity';
-import { PermissionHelper } from 'src/helper/permisson-helper.service';
-import { App404Exception, AppException, AppExistedException } from 'src/middleware/app-error-handler';
-import { HelperUtils } from 'src/utils/helpers';
-import { DataSource } from 'typeorm';
-import { CacheUser } from 'src/dto/common-request.dto';
-import { CondUtil } from 'src/utils/condition';
 import { ERROR_MSG } from 'src/constant/error';
-import { RoleHelper } from 'src/helper/role-helper.service';
-import { SearchClassroomDto } from 'src/dto/classroom-dto/search-classroom.dto';
+import { CacheUser } from 'src/dto/common-request.dto';
 import { PageDto } from 'src/dto/paginate.dto';
-import { ClassroomHelper } from 'src/helper/classroom-helper.service';
-import { QueryUtil } from 'src/utils/query';
+import { CreateVocabularyDto, UpdateVocabularyDto } from 'src/dto/vocabulary-dto/create-vocabulary.dto';
+import { SearchVocabularyDto } from 'src/dto/vocabulary-dto/search-vocabulary.dto';
+import { Vocabulary } from 'src/entities/vocabulary/vocabulary.entity';
+import { PermissionHelper } from 'src/helper/permisson-helper.service';
+import { RoleHelper } from 'src/helper/role-helper.service';
+import { VocabularyHelper } from 'src/helper/vocabulary-helper.service';
+import { App404Exception, AppException, AppExistedException } from 'src/middleware/app-error-handler';
+import { CondUtil } from 'src/utils/condition';
 import { GenerateUtil } from 'src/utils/generate';
-import { User } from 'src/entities/user/user.entity';
-import { ClassRoomAction } from '../classroom/classroom-permission.interface';
+import { HelperUtils } from 'src/utils/helpers';
+import { QueryUtil } from 'src/utils/query';
+import { DataSource, In } from 'typeorm';
+import { VocabularyAction } from './vocabulary.permission.interface';
 
 @Injectable()
 export class VocabularyService {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
-  search = async (query: SearchClassroomDto): Promise<PageDto<ClassRoom>> => {
-    const [data, itemCount] = await ClassRoom.findAndCount({
+  search = async (query: SearchVocabularyDto): Promise<PageDto<Vocabulary>> => {
+    const [data, itemCount] = await Vocabulary.findAndCount({
       select: {
         id: true,
-        name: true,
+        content: true,
         createdAt: true,
         description: true,
-        thumbnailPath: true,
+        imagesPath: true,
         status: true,
-        classLevel: true,
-        teacherId: true,
-        classCode: true,
+        classroomId: true,
+        creatorId: true,
+        vocabularyType: true,
+        isPrivate: true,
+        topicId: true,
         slug: true,
-        teacher: {
+        topic: {
           id: true,
           name: true,
         },
       },
-      where: ClassroomHelper.getFilterSearchClassroom(query),
-      relations: { teacher: true },
+      where: VocabularyHelper.getFilterSearchVocabulary(query),
+      relations: { topic: true },
       order: QueryUtil.getSort(query.orderBy, query.sortBy),
       skip: query.skip,
       take: query.take,
@@ -51,119 +51,108 @@ export class VocabularyService {
     return GenerateUtil.paginate({ data, itemCount, query });
   };
 
-  getAllStudent = async (classroomId: number, cacheUser: CacheUser, query, permissionCode): Promise<any> => {
-    const isPermission = await PermissionHelper.isPermissionChange(cacheUser.userId, permissionCode);
-    if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
-
-    const [data, itemCount] = await ClassStudent.findAndCount({
-      select: {
-        id: true,
-        studentId: true,
-        student: {
-          id: true,
-          username: true,
-          email: true,
-        },
-      },
-      relations: { student: true },
-      where: { classroomId: classroomId },
-    });
-
-    return GenerateUtil.paginate({ data, itemCount, query });
-  };
-
-  async createClassroom(userId: number, body: CreateClassroomDto, permissionCode) {
-    const isExistByName = await HelperUtils.existByName(ClassRoom, body.name, 'name');
-    if (isExistByName) throw new AppExistedException('name', body);
+  async create(userId: number, body: CreateVocabularyDto, permissionCode) {
+    const isExistByName = await HelperUtils.existByName(Vocabulary, body.content, 'content');
+    if (isExistByName) throw new AppExistedException('content', body);
 
     const isPermission = await PermissionHelper.isPermissionChange(userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
 
-    if (body.teacherId) {
-      const teacher = await User.findOneBy({ id: body.teacherId, role: { code: 'TEACHER' } });
-      if (!teacher) throw new App404Exception('teacherId', { teacherId: body.teacherId });
-    }
-
     const userRole = await RoleHelper.getRoleByUserId(userId);
 
-    const classroom = new ClassRoom();
+    const vocabulary = new Vocabulary();
 
-    classroom.name = body.name;
-    classroom.teacherId = body.teacherId;
-    classroom.description = body.description;
-    classroom.thumbnailPath = body.thumbnailPath;
-    classroom.classCode = body.classCode || HelperUtils.generateRandomClassCode();
-    classroom.isTeacherCreated = true;
-    classroom.classLevel = body.classLevel;
+    vocabulary.content = body.content;
+    vocabulary.description = body.description;
+    vocabulary.imagesPath = body.imagesPath;
+    vocabulary.classroomId = body.classroomId;
+    vocabulary.creatorId = userId;
+    vocabulary.topicId = body.topicId;
+    vocabulary.vocabularyType = body.vocabularyType;
+    vocabulary.isPrivate = body.isPrivate;
 
     if (userRole.code === 'ADMIN') {
-      classroom.isTeacherCreated = false;
+      vocabulary.status = body.status;
     }
 
-    await classroom.save();
-    return classroom;
+    return await vocabulary.save();
   }
 
-  getById = async (id: number): Promise<ClassRoom> => {
-    const classRoom = await ClassRoom.findOne({
+  getById = async (id: number): Promise<Vocabulary> => {
+    const vocabulary = await Vocabulary.findOne({
       select: {
-        teacher: {
+        topic: {
           id: true,
-          username: true,
+          name: true,
+        },
+        classroom: {
+          id: true,
+          name: true,
+        },
+        creator: {
+          id: true,
+          name: true,
         },
       },
       where: { id },
-      relations: { teacher: true },
+      relations: { topic: true, classroom: true, creator: true },
     });
-    if (!classRoom) throw new App404Exception('id', { id });
-    return classRoom;
+    if (!vocabulary) throw new App404Exception('id', { id });
+    return vocabulary;
   };
 
   updateById = async (
     id: number,
     user: CacheUser,
-    body: UpdateClassroomDto,
+    body: UpdateVocabularyDto,
     permissionCode: string,
-  ): Promise<ClassRoom> => {
-    let classroom;
+  ): Promise<Vocabulary> => {
+    let vocabulary;
     if (user.roleCode === 'ADMIN') {
-      classroom = await ClassRoom.findOne({ where: { id } });
+      vocabulary = await Vocabulary.findOne({ where: { id } });
     } else {
-      classroom = await ClassRoom.findOne({ where: { id, teacherId: user.userId } });
+      vocabulary = await Vocabulary.findOne({ where: { id, creatorId: user.userId } });
     }
-    if (!classroom) throw new App404Exception('id', { id });
+    if (!vocabulary) throw new App404Exception('id', { id });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
 
-    CondUtil.saveIfChanged(classroom, body, ['name', 'description', 'thumbnailPath']);
+    CondUtil.saveIfChanged(vocabulary, body, [
+      'content',
+      'description',
+      'imagesPath',
+      'status',
+      'classroomId',
+      'videosPath',
+      'vocabularyType',
+    ]);
 
-    if (!!body.status && body.status !== classroom.status) {
-      const isPermission = await PermissionHelper.isPermissionChange(user.userId, ClassRoomAction.APPROVE_CLASS);
+    if (!!body.status && body.status !== vocabulary.status) {
+      const isPermission = await PermissionHelper.isPermissionChange(user.userId, VocabularyAction.Approve_Vocabulary);
       if (!isPermission) throw new AppException(ERROR_MSG.PERMISSION_DENIED);
-      classroom.status = body.status;
+      vocabulary.status = body.status;
     }
 
-    await classroom.save();
-    return classroom;
+    return await vocabulary.save();
   };
 
-  deleteById = async (id: number, user: CacheUser, permissionCode): Promise<ClassRoom> => {
+  deleteByIds = async (vocabularyIds: number[], user: CacheUser, permissionCode): Promise<any> => {
+    let vocabulary;
     const userRole = await RoleHelper.getRoleByUserId(user.userId);
     if (userRole.code === 'ADMIN') {
-      const classroom = await ClassRoom.findOne({ where: { id } });
-      if (!classroom) throw new App404Exception('id', { id });
-      await classroom.remove();
-      return classroom;
+      vocabulary = await Vocabulary.find({ where: { id: In(vocabularyIds) } });
+    } else {
+      vocabulary = await Vocabulary.find({ where: { id: In(vocabularyIds), creatorId: user.userId } });
     }
 
-    const classroom = await ClassRoom.findOne({ where: { id, teacherId: user.userId } });
-    if (!classroom) throw new App404Exception('id', { id });
+    if (!vocabulary.length) throw new App404Exception('id', { id: vocabularyIds });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
 
-    await classroom.remove();
-    return classroom;
+    await vocabulary.map((vocabulary) => vocabulary.remove());
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return true;
   };
 }

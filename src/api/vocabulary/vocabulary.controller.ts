@@ -2,9 +2,9 @@ import { Get, Param, Query } from '@nestjs/common';
 import { EntityNameConst } from 'src/constant/entity-name';
 import { ApiHandleResponse } from 'src/decorator/api.decorator';
 import { IsAuthController } from 'src/decorator/auth.decorator';
-import { SearchClassroomDto } from 'src/dto/classroom-dto/search-classroom.dto';
-import { VocabularyService } from './vocabulary.service';
+import { SearchVocabularyDto } from 'src/dto/vocabulary-dto/search-vocabulary.dto';
 import { Vocabulary } from 'src/entities/vocabulary/vocabulary.entity';
+import { VocabularyService } from './vocabulary.service';
 
 @IsAuthController(EntityNameConst.VOCABULARY, false)
 export class VocabularyController {
@@ -15,7 +15,7 @@ export class VocabularyController {
     summary: 'Get all vocabulary',
     type: Vocabulary,
   })
-  async search(@Query() query: SearchClassroomDto) {
+  async search(@Query() query: SearchVocabularyDto) {
     return await this.vocabularyService.search(query);
   }
 

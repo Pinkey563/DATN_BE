@@ -99,6 +99,7 @@ export class ClassroomService {
 
     if (userRole.code === 'ADMIN') {
       classroom.isTeacherCreated = false;
+      classroom.status = AppStatus.APPROVED;
     }
 
     await classroom.save();

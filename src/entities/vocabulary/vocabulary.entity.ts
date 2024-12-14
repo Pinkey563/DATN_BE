@@ -13,10 +13,10 @@ import { VocabularyView } from './vocabulary-view.entity';
 @Entity(EntityNameConst.VOCABULARY)
 export class Vocabulary extends AbstractTimeEntity {
   @DBColumn({
-    name: 'title',
+    name: 'content',
     type: 'varchar',
   })
-  title: string;
+  content: string;
 
   @DBColumn({
     name: 'description',
@@ -24,6 +24,13 @@ export class Vocabulary extends AbstractTimeEntity {
     nullable: true,
   })
   description: string;
+
+  @DBColumn({
+    name: 'is_private',
+    type: 'boolean',
+    default: false,
+  })
+  isPrivate: boolean;
 
   @DBColumn({
     name: 'topic_id',
@@ -64,8 +71,9 @@ export class Vocabulary extends AbstractTimeEntity {
     name: 'videos_path',
     type: 'varchar',
     nullable: true,
+    array: true,
   })
-  videoPath: string;
+  videosPath: string;
 
   @DBColumn({ name: 'slug', type: 'varchar', nullable: true })
   slug: string;
@@ -92,11 +100,11 @@ export class Vocabulary extends AbstractTimeEntity {
 
   @BeforeInsert()
   handleBeforeInsert() {
-    this.slug = StringUtil.createSlug(this.title);
+    this.slug = StringUtil.createSlug(this.content);
   }
 
   @BeforeUpdate()
   handleBeforeUpdate() {
-    this.slug = StringUtil.createSlug(this.title);
+    this.slug = StringUtil.createSlug(this.content);
   }
 }
