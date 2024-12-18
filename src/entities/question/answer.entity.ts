@@ -14,14 +14,35 @@ export class Answer extends AbstractCreatedIdEntity {
   content: string;
 
   @DBColumn({
+    name: 'correct',
+    type: 'boolean',
+    default: false,
+  })
+  correct: boolean;
+
+  @DBColumn({
+    name: 'image_location',
+    type: 'varchar',
+    nullable: true,
+  })
+  imageLocation: string;
+
+  @DBColumn({
+    name: 'video_location',
+    type: 'varchar',
+    nullable: true,
+  })
+  videoLocation: string;
+
+  @DBColumn({
     name: 'question_id',
     type: 'int',
   })
-  questionId: string;
+  questionId: number;
 
   // RELATIONSHIP
 
-  @ManyToOne(() => Question, (question) => question.answers, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Question, (question) => question.answerResList, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'question_id' })
   question: Question;
 

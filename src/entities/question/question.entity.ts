@@ -1,6 +1,6 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { AppStatus } from 'src/types/common';
+import { FileType, QuestionType } from 'src/types/classroom';
 import { StringUtil } from 'src/utils/string';
 import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { ClassRoom } from '../class/classroom.entity';
@@ -8,15 +8,21 @@ import { AbstractTimeEntity } from '../entity.interface';
 import { User } from '../user/user.entity';
 import { Answer } from './answer.entity';
 import { StudentAnswer } from './student-answer.entity';
-import { Topic } from '../vocabulary/topic.entity';
 
 @Entity(EntityNameConst.QUESTION)
 export class Question extends AbstractTimeEntity {
   @DBColumn({
-    name: 'title',
+    name: 'content',
     type: 'varchar',
   })
-  title: string;
+  content: string;
+
+  @DBColumn({
+    name: 'explanation',
+    type: 'varchar',
+    nullable: true,
+  })
+  explanation: string;
 
   @DBColumn({
     name: 'description',
@@ -30,14 +36,7 @@ export class Question extends AbstractTimeEntity {
     type: 'int',
     nullable: true,
   })
-  classroomId: number;
-
-  @DBColumn({
-    name: 'topic_id',
-    type: 'int',
-    nullable: true,
-  })
-  topicId: number;
+  classRoomId: number;
 
   @DBColumn({
     name: 'creator_id',
@@ -47,25 +46,37 @@ export class Question extends AbstractTimeEntity {
   creatorId: number;
 
   @DBColumn({
-    name: 'images_path',
+    name: 'image_location',
     type: 'varchar',
     nullable: true,
-    array: true,
   })
-  imagesPath: string[];
+  imageLocation: string;
 
   @DBColumn({
-    name: 'video_path',
+    name: 'video_location',
     type: 'varchar',
     nullable: true,
   })
-  videoPath: string;
+  videoLocation: string;
+
+  @DBColumn({
+    name: 'file_type',
+    type: 'enum',
+    enum: FileType,
+    default: FileType.EXISTED,
+  })
+  fileType: FileType;
+
+  @DBColumn({
+    name: 'question_type',
+    type: 'enum',
+    enum: QuestionType,
+    default: QuestionType.MULTIPLE_ANSWERS,
+  })
+  questionType: QuestionType;
 
   @DBColumn({ name: 'slug', type: 'varchar', nullable: true })
   slug: string;
-
-  @DBColumn({ name: 'status', type: 'enum', enum: AppStatus, default: AppStatus.PENDING })
-  status: AppStatus;
 
   // RELATIONSHIP
 
@@ -81,19 +92,15 @@ export class Question extends AbstractTimeEntity {
   studentAnswer: StudentAnswer;
 
   @OneToMany(() => Answer, (answer) => answer.question)
-  answers: Answer[];
-
-  @ManyToOne(() => Topic, (topic) => topic.questions, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'topic_id' })
-  topic: Topic;
+  answerResList: Answer[];
 
   @BeforeInsert()
   handleBeforeInsert() {
-    this.slug = StringUtil.createSlug(this.title);
+    this.slug = StringUtil.createSlug(this.content);
   }
 
   @BeforeUpdate()
   handleBeforeUpdate() {
-    this.slug = StringUtil.createSlug(this.title);
+    this.slug = StringUtil.createSlug(this.content);
   }
 }

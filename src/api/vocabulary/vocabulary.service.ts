@@ -29,6 +29,7 @@ export class VocabularyService {
         createdAt: true,
         description: true,
         imagesPath: true,
+        videosPath: true,
         status: true,
         classroomId: true,
         creatorId: true,

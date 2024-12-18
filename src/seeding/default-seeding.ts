@@ -22,6 +22,7 @@ import {
 import { seedingEntity } from './seeding-utils';
 import { VocabularyAction } from 'src/api/vocabulary/vocabulary.permission.interface';
 import { TopicAction } from 'src/api/topic/Topic-permission.interface';
+import { QuestionAction } from 'src/api/question/question-permission.interface';
 
 const PermissionAdminRoleCode = [
   ...Object.values(UserAction),
@@ -29,6 +30,7 @@ const PermissionAdminRoleCode = [
   ...Object.values(ClassRoomAction),
   ...Object.values(VocabularyAction),
   ...Object.values(TopicAction),
+  ...Object.values(QuestionAction),
 ];
 
 const PermissionUserRoleCode = [
@@ -43,11 +45,13 @@ const PermissionTeacherRoleCode = [
   ...Object.values(ClassRoomAction).filter((item) => item !== ClassRoomAction.APPROVE_CLASS),
   ...Object.values(VocabularyAction),
   ...Object.values(TopicAction),
+  ...Object.values(QuestionAction),
 ];
 
 const PermissionVolunteerRoleCode = [
   ...PermissionUserRoleCode,
   ...Object.values(VocabularyAction).filter((item) => item !== VocabularyAction.Approve_Vocabulary),
+  ...Object.values(QuestionAction),
 ];
 
 const seedingRolePermission = async (permissionCodes, roleCode) => {

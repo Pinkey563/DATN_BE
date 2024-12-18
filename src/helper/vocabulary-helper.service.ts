@@ -13,7 +13,7 @@ export class VocabularyHelper {
       ...(q.topicId && { topicId: q.topicId }),
       ...(q.classroomId && { classroomId: q.classroomId }),
       ...(q.creatorId && { creatorId: q.creatorId }),
-      isPrivate: q.isPrivate,
+      ...(q.isPrivate === undefined ? {} : { isPrivate: q.isPrivate }),
     };
 
     return { ...where };
