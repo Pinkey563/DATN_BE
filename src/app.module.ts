@@ -15,6 +15,7 @@ import { ClassroomModule } from './api/classroom/classroom.module';
 import { VocabularyModule } from './api/vocabulary/vocabulary.module';
 import { TopicModule } from './api/topic/topic.module';
 import { QuestionModule } from './api/question/question.module';
+import { ExamModule } from './api/exam/exam.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { QuestionModule } from './api/question/question.module';
     VocabularyModule,
     TopicModule,
     QuestionModule,
+    ExamModule,
   ],
   controllers: [],
   providers: [],

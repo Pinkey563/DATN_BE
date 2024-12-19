@@ -5,6 +5,7 @@ import { StringUtil } from 'src/utils/string';
 import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { ClassRoom } from '../class/classroom.entity';
 import { AbstractTimeEntity } from '../entity.interface';
+import { ExamQuestion } from '../exam/exam-question.entity';
 import { User } from '../user/user.entity';
 import { Answer } from './answer.entity';
 import { StudentAnswer } from './student-answer.entity';
@@ -93,6 +94,9 @@ export class Question extends AbstractTimeEntity {
 
   @OneToMany(() => Answer, (answer) => answer.question)
   answerResList: Answer[];
+
+  @OneToMany(() => ExamQuestion, (exam) => exam.question)
+  exams: ExamQuestion[];
 
   @BeforeInsert()
   handleBeforeInsert() {

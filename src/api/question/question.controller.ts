@@ -27,4 +27,13 @@ export class QuestionController {
   async getProfileById(@Param('id') id: number) {
     return await this.questionService.getById(id);
   }
+
+  @Get('/question-of-exam/:id')
+  @ApiHandleResponse({
+    summary: 'Get question list of exam',
+    type: Question,
+  })
+  async getQuestionOfExam(@Param('id') id: number) {
+    return await this.questionService.getQuestionOfExam(id);
+  }
 }

@@ -23,6 +23,7 @@ import { seedingEntity } from './seeding-utils';
 import { VocabularyAction } from 'src/api/vocabulary/vocabulary.permission.interface';
 import { TopicAction } from 'src/api/topic/Topic-permission.interface';
 import { QuestionAction } from 'src/api/question/question-permission.interface';
+import { ExamAction } from 'src/api/exam/exam-permission.interface';
 
 const PermissionAdminRoleCode = [
   ...Object.values(UserAction),
@@ -31,6 +32,7 @@ const PermissionAdminRoleCode = [
   ...Object.values(VocabularyAction),
   ...Object.values(TopicAction),
   ...Object.values(QuestionAction),
+  ...Object.values(ExamAction),
 ];
 
 const PermissionUserRoleCode = [
@@ -46,6 +48,7 @@ const PermissionTeacherRoleCode = [
   ...Object.values(VocabularyAction),
   ...Object.values(TopicAction),
   ...Object.values(QuestionAction),
+  ...Object.values(ExamAction),
 ];
 
 const PermissionVolunteerRoleCode = [

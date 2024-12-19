@@ -19,4 +19,5 @@ export const EntityNameConst = Object.freeze({
   CLASS_STUDENT: 'class_student',
   CLASS_LEVEL: 'class_level',
   STUDENT_PROFILE: 'student_profile',
+  EXAM_QUESTION: 'exam_question',
 });

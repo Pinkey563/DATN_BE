@@ -238,4 +238,19 @@ export class QuestionService {
 
     return true;
   };
+
+  getQuestionOfExam = async (id: number): Promise<Question[]> => {
+    const questions = await Question.find({
+      where: {
+        exams: {
+          examId: id,
+        },
+      },
+      relations: { answerResList: true, exams: true },
+    });
+
+    if (!questions) throw new App404Exception('id', { id });
+
+    return questions;
+  };
 }
