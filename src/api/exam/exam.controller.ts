@@ -27,4 +27,13 @@ export class ExamController {
   async getProfileById(@Param('id') id: number) {
     return await this.examService.getById(id);
   }
+
+  @Get('/exam-saved/:id')
+  @ApiHandleResponse({
+    summary: 'Get all exams saved by user',
+    type: EXAM,
+  })
+  async getExamsSaved(@Param('id') id: number) {
+    return await this.examService.getExamsSaved(id);
+  }
 }

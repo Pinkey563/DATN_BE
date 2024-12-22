@@ -1,9 +1,8 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractCreatedIdEntity } from '../entity.interface';
 import { Question } from './question.entity';
-import { StudentAnswer } from './student-answer.entity';
 
 @Entity(EntityNameConst.ANSWER)
 export class Answer extends AbstractCreatedIdEntity {
@@ -45,7 +44,4 @@ export class Answer extends AbstractCreatedIdEntity {
   @ManyToOne(() => Question, (question) => question.answerResList, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'question_id' })
   question: Question;
-
-  @OneToOne(() => StudentAnswer, (studentAnswer) => studentAnswer.answers, { onDelete: 'CASCADE' })
-  studentAnswer: StudentAnswer;
 }

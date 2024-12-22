@@ -4,10 +4,12 @@ import { Audit } from 'entity-diff';
 import { ERROR_MSG } from 'src/constant/error';
 import { CacheUser } from 'src/dto/common-request.dto';
 import { CreateExamDto, UpdateExamDto } from 'src/dto/exam/create-exam.dto';
-import { SearchExamDto } from 'src/dto/exam/search-exam.dto';
+import { SaveExamDto } from 'src/dto/exam/save-exam.dto';
+import { SearchExamAttemptDto, SearchExamDto } from 'src/dto/exam/search-exam.dto';
 import { PageDto } from 'src/dto/paginate.dto';
 import { ExamQuestion } from 'src/entities/exam/exam-question.entity';
 import { EXAM } from 'src/entities/exam/exam.entity';
+import { StudentAnswer } from 'src/entities/question/student-answer.entity';
 import { ExamHelper } from 'src/helper/exam-helper.service';
 import { PermissionHelper } from 'src/helper/permisson-helper.service';
 import { RoleHelper } from 'src/helper/role-helper.service';
@@ -17,6 +19,7 @@ import { GenerateUtil } from 'src/utils/generate';
 import { HelperUtils } from 'src/utils/helpers';
 import { QueryUtil } from 'src/utils/query';
 import { DataSource, In } from 'typeorm';
+import { ExamAttempt } from './../../entities/exam/exam-attempt.entity';
 
 @Injectable()
 export class ExamService {
@@ -41,6 +44,44 @@ export class ExamService {
       },
       where: ExamHelper.getFilterSearchExam(query),
       relations: { classroom: true },
+      order: QueryUtil.getSort(query.orderBy, query.sortBy),
+      skip: query.skip,
+      take: query.take,
+    });
+
+    return GenerateUtil.paginate({ data, itemCount, query });
+  };
+
+  searchAllExamAttemptForUser = async (userId, query: SearchExamAttemptDto, permissionCode) => {
+    const isPermission = await PermissionHelper.isPermissionChange(userId, permissionCode);
+    if (!isPermission) {
+      throw new App404Exception('permissionCode', { permissionCode });
+    }
+
+    const [data, itemCount] = await ExamAttempt.findAndCount({
+      select: {
+        id: true,
+        score: true,
+        createdAt: true,
+        studentId: true,
+        isFinished: true,
+        exam: {
+          id: true,
+          name: true,
+          classRoomId: true,
+          numberOfQuestions: true,
+          private: true,
+          classroom: {
+            id: true,
+            name: true,
+            classLevel: true,
+          },
+        },
+      },
+      where: {
+        ...ExamHelper.getFilterSearchExamAttempt(query),
+      },
+      relations: { exam: { classroom: true } },
       order: QueryUtil.getSort(query.orderBy, query.sortBy),
       skip: query.skip,
       take: query.take,
@@ -164,5 +205,116 @@ export class ExamService {
 
     await exam.remove();
     return true;
+  };
+
+  addExamsForUser = async (userId, examIds, permissionCode) => {
+    const isPermission = await PermissionHelper.isPermissionChange(userId, permissionCode);
+    if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
+
+    if (examIds.length === 0) throw new AppException(ERROR_MSG.HAVE_NOT_ANY_CHANGE);
+
+    await this.dataSource.transaction(async (txEntityManager) => {
+      await Promise.all(
+        examIds.map(async (examId) => {
+          const isExist = await ExamAttempt.findOneBy({ studentId: userId, examId: examId });
+          if (isExist) return true;
+          const examAttempt = new ExamAttempt();
+          examAttempt.studentId = userId;
+          examAttempt.examId = examId;
+          return await txEntityManager.save(examAttempt);
+        }),
+      );
+
+      return true;
+    });
+  };
+
+  deleteExamAttempt = async (user: CacheUser, id, permissionCode) => {
+    const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
+    if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
+
+    let examAttempt;
+    if (user.roleCode === 'ADMIN') {
+      examAttempt = await ExamAttempt.findOneBy({ id });
+    } else {
+      examAttempt = await ExamAttempt.findOneBy({ id, studentId: user.userId });
+    }
+    if (!examAttempt) throw new App404Exception('id', { id });
+
+    await examAttempt.remove();
+  };
+
+  getExamsSaved = async (examId) => {
+    const examAttempts = await StudentAnswer.find({
+      where: {
+        examAttempt: {
+          examId,
+        },
+      },
+      relations: {
+        examAttempt: true,
+      },
+    });
+
+    if (!examAttempts) throw new App404Exception('examId', { examId });
+
+    return examAttempts;
+  };
+
+  saveExamsSaved = async (userId, body: SaveExamDto[], score) => {
+    const examAttempt = await ExamAttempt.findOne({
+      where: {
+        studentId: userId,
+        examId: body[0].examId,
+      },
+    });
+
+    if (!examAttempt) throw new App404Exception('examId', { examId: body[0].examId });
+
+    await this.dataSource.transaction(async (txEntityManager) => {
+      examAttempt.score = score;
+      examAttempt.isFinished = true;
+      await txEntityManager.save(examAttempt);
+
+      const studentAnswers = await StudentAnswer.find({
+        where: {
+          examAttempt: {
+            studentId: userId,
+            examId: body[0].examId,
+          },
+        },
+        relations: {
+          examAttempt: true,
+        },
+      });
+
+      if (studentAnswers.length === 0) {
+        await Promise.all(
+          body.map(async (item) => {
+            const studentAnswer = new StudentAnswer();
+            studentAnswer.questionId = item.questionId;
+            studentAnswer.selectedAnswers = [...item.selectedAnswers];
+            studentAnswer.answeredAt = new Date().toISOString();
+            studentAnswer.examAttemptId = examAttempt.id;
+            await studentAnswer.save();
+          }),
+        );
+      } else {
+        await Promise.all(
+          body.map(async (item, index) => {
+            const studentAnswer = await StudentAnswer.findOne({
+              where: {
+                questionId: item.questionId,
+                examAttemptId: studentAnswers[index].examAttemptId,
+              },
+            });
+
+            studentAnswer.selectedAnswers = [...item.selectedAnswers];
+            studentAnswer.answeredAt = new Date().toISOString();
+            await studentAnswer.save();
+          }),
+        );
+      }
+    });
   };
 }

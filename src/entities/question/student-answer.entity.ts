@@ -1,10 +1,9 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { Entity, JoinColumn, OneToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractTimeEntity } from '../entity.interface';
-import { Answer } from './answer.entity';
-import { Question } from './question.entity';
 import { ExamAttempt } from '../exam/exam-attempt.entity';
+import { Question } from './question.entity';
 
 @Entity(EntityNameConst.STUDENT_ANSWER)
 export class StudentAnswer extends AbstractTimeEntity {
@@ -13,7 +12,7 @@ export class StudentAnswer extends AbstractTimeEntity {
     type: 'int',
     nullable: true,
   })
-  examAttemptId: string;
+  examAttemptId: number;
 
   @DBColumn({
     name: 'question_id',
@@ -22,10 +21,11 @@ export class StudentAnswer extends AbstractTimeEntity {
   questionId: number;
 
   @DBColumn({
-    name: 'answer_id',
+    name: 'selected_answers',
     type: 'int',
+    array: true,
   })
-  answerId: number;
+  selectedAnswers: number[];
 
   @DBColumn({
     name: 'answered_at',
@@ -35,15 +35,11 @@ export class StudentAnswer extends AbstractTimeEntity {
   answeredAt: string;
   // RELATIONSHIP
 
-  @OneToOne(() => Answer, (answer) => answer.studentAnswer)
-  @JoinColumn({ name: 'answer_id' })
-  answers: Answer;
-
-  @OneToOne(() => Question, (question) => question.studentAnswer)
+  @ManyToOne(() => Question, (question) => question.studentAnswers)
   @JoinColumn({ name: 'question_id' })
   question: Question;
 
-  @OneToOne(() => ExamAttempt, (examAttempt) => examAttempt.studentAnswer)
+  @ManyToOne(() => ExamAttempt, (examAttempt) => examAttempt.studentAnswers, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'exam_attempt_id' })
   examAttempt: ExamAttempt;
 }

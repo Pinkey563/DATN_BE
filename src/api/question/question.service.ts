@@ -239,8 +239,8 @@ export class QuestionService {
     return true;
   };
 
-  getQuestionOfExam = async (id: number): Promise<Question[]> => {
-    const questions = await Question.find({
+  getQuestionOfExam = async (id: number): Promise<PageDto<Question>> => {
+    const [data, itemCount] = await Question.findAndCount({
       where: {
         exams: {
           examId: id,
@@ -249,8 +249,6 @@ export class QuestionService {
       relations: { answerResList: true, exams: true },
     });
 
-    if (!questions) throw new App404Exception('id', { id });
-
-    return questions;
+    return GenerateUtil.paginate({ data, itemCount, query: {} });
   };
 }

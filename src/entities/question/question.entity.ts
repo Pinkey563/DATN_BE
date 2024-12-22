@@ -2,7 +2,7 @@ import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
 import { FileType, QuestionType } from 'src/types/classroom';
 import { StringUtil } from 'src/utils/string';
-import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ClassRoom } from '../class/classroom.entity';
 import { AbstractTimeEntity } from '../entity.interface';
 import { ExamQuestion } from '../exam/exam-question.entity';
@@ -89,8 +89,8 @@ export class Question extends AbstractTimeEntity {
   @JoinColumn({ name: 'classroom_id' })
   classroom: ClassRoom;
 
-  @OneToOne(() => StudentAnswer, (studentAnswer) => studentAnswer.question)
-  studentAnswer: StudentAnswer;
+  @OneToMany(() => StudentAnswer, (studentAnswer) => studentAnswer.question)
+  studentAnswers: StudentAnswer[];
 
   @OneToMany(() => Answer, (answer) => answer.question)
   answerResList: Answer[];

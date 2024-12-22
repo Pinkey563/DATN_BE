@@ -1,10 +1,10 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { Entity, JoinColumn, ManyToOne, OneToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractCreatedIdEntity } from '../entity.interface';
+import { StudentAnswer } from '../question/student-answer.entity';
 import { User } from '../user/user.entity';
 import { EXAM } from './exam.entity';
-import { StudentAnswer } from '../question/student-answer.entity';
 
 @Entity(EntityNameConst.EXAM_ATTEMPT)
 export class ExamAttempt extends AbstractCreatedIdEntity {
@@ -12,20 +12,29 @@ export class ExamAttempt extends AbstractCreatedIdEntity {
     name: 'student_id',
     type: 'int',
   })
-  studentId: string;
+  studentId: number;
 
   @DBColumn({
     name: 'exam_id',
     type: 'int',
   })
-  examId: string;
+  examId: number;
 
   @DBColumn({
-    name: 'attempted_at',
-    type: 'timestamptz',
+    name: 'score',
+    type: 'numeric',
     nullable: true,
+    precision: 10,
+    scale: 2,
   })
-  attemptedAt: string;
+  score: number;
+
+  @DBColumn({
+    name: 'is_finished',
+    type: 'boolean',
+    default: false,
+  })
+  isFinished: boolean;
 
   // RELATIONSHIP
 
@@ -37,6 +46,6 @@ export class ExamAttempt extends AbstractCreatedIdEntity {
   @JoinColumn({ name: 'exam_id' })
   exam: EXAM;
 
-  @OneToOne(() => StudentAnswer, (studentAnswer) => studentAnswer.examAttempt)
-  studentAnswer: StudentAnswer;
+  @OneToMany(() => StudentAnswer, (studentAnswer) => studentAnswer.examAttempt)
+  studentAnswers: StudentAnswer[];
 }

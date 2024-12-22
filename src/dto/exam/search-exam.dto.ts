@@ -12,5 +12,19 @@ export class SearchExamDto extends PageOptionsDto {
   readonly creatorId: number;
 
   @IsSwaggerBoolean({}, false)
-  readonly private: boolean;
+  readonly isPrivate: boolean;
+}
+
+export class SearchExamAttemptDto extends PageOptionsDto {
+  @IsSwaggerNumber({}, false)
+  readonly studentId: number;
+
+  @IsSwaggerBoolean({}, false)
+  readonly isFinished: boolean;
+
+  @IsSwaggerNumber({}, false)
+  readonly examId: number;
+
+  @IsSwaggerNumber({}, false)
+  readonly classRoomId: number;
 }
