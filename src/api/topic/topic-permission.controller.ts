@@ -4,7 +4,7 @@ import { ApiHandleResponse } from 'src/decorator/api.decorator';
 import { IsAuthController } from 'src/decorator/auth.decorator';
 import { RequestAuth } from 'src/dto/common-request.dto';
 import { Topic } from './../../entities/vocabulary/topic.entity';
-import { TopicAction, TopicSummary } from './Topic-permission.interface';
+import { TopicAction, TopicSummary } from './topic-permission.interface';
 import { TopicService } from './topic.service';
 import { CreateTopicDto, UpdateTopicDto } from 'src/dto/topic/create-topic.dto';
 

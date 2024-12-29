@@ -4,10 +4,11 @@ import { ApiHandleResponse } from 'src/decorator/api.decorator';
 import { IsAuthController } from 'src/decorator/auth.decorator';
 import { LoginResponse } from 'src/dto/common-response.dto';
 import { LoginDto } from 'src/dto/user-dto/login.dto';
-import { SearchUserDto } from 'src/dto/user-dto/search-user.dto';
+import { SearchUserDto, SearchUserStatisticDto } from 'src/dto/user-dto/search-user.dto';
 import { User } from 'src/entities/user/user.entity';
 import { UserService } from './user.service';
 import { RegisterDto, VerifyEmailDto } from 'src/dto/user-dto/register.dto';
+import { UserStatistic } from 'src/entities/user/user-statistic.entity';
 
 @IsAuthController(EntityNameConst.USER, false)
 export class UserController {
@@ -29,6 +30,18 @@ export class UserController {
   })
   async search(@Query() query: SearchUserDto) {
     return await this.userService.search(query);
+  }
+
+  @Get('/statistics/:id')
+  @ApiHandleResponse({ type: UserStatistic, summary: 'Get user statistics' })
+  async getStatisticsById(@Param('id') id: number) {
+    return await this.userService.getStatisticsById(id);
+  }
+
+  @Get('/search-statistics')
+  @ApiHandleResponse({ type: UserStatistic, summary: 'Get user statistics' })
+  async searchStatistics(@Query() query: SearchUserStatisticDto) {
+    return await this.userService.searchStatistics(query);
   }
 
   @Get('/:id')

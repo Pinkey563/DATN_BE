@@ -131,6 +131,41 @@ export class User extends AbstractTimeEntity {
   @OneToMany(() => Topic, (topic) => topic.creator)
   topics: Topic[];
 
+  @DBColumn({
+    name: 'school_name',
+    type: 'varchar',
+    nullable: true,
+  })
+  schoolName: string;
+
+  @DBColumn({
+    name: 'house_street',
+    type: 'varchar',
+    nullable: true,
+  })
+  houseStreet: string;
+
+  @DBColumn({
+    name: 'ward',
+    type: 'varchar',
+    nullable: true,
+  })
+  ward: string;
+
+  @DBColumn({
+    name: 'district',
+    type: 'varchar',
+    nullable: true,
+  })
+  district: string;
+
+  @DBColumn({
+    name: 'city',
+    type: 'varchar',
+    nullable: true,
+  })
+  city: string;
+
   @BeforeInsert()
   handleBeforeInsert() {
     this.slug = StringUtil.createSlug(this.name);

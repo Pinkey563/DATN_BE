@@ -1,4 +1,5 @@
-import { SearchUserDto } from 'src/dto/user-dto/search-user.dto';
+import { SearchUserDto, SearchUserStatisticDto } from 'src/dto/user-dto/search-user.dto';
+import { UserStatistic } from 'src/entities/user/user-statistic.entity';
 import { User } from 'src/entities/user/user.entity';
 import { ConditionWhere } from 'src/types/query.type';
 import { FindOptionsSelect, ILike } from 'typeorm';
@@ -31,5 +32,16 @@ export class UserHelper {
     const year = new Date().getFullYear();
     const studentCode = `${year}${studentId.toString().padStart(4, '0')}`;
     return studentCode;
+  }
+
+  static getFilterSearchUserStatistic(query: SearchUserStatisticDto): ConditionWhere<UserStatistic> {
+    let where: ConditionWhere<UserStatistic> = {};
+
+    where = {
+      ...(query.name && { name: ILike(`%${query.name}%`) }),
+      ...(query.userId && { userId: query.userId }),
+    };
+
+    return { ...where };
   }
 }

@@ -19,6 +19,21 @@ export class UpdateUserProfileDto {
 
   @IsSwaggerEnum({ enum: Gender }, false)
   readonly gender: Gender;
+
+  @IsSwaggerString({}, false)
+  readonly schoolName: string;
+
+  @IsSwaggerString({}, false)
+  readonly houseStreet: string;
+
+  @IsSwaggerString({}, false)
+  readonly ward: string;
+
+  @IsSwaggerString({}, false)
+  readonly district: string;
+
+  @IsSwaggerString({}, false)
+  readonly city: string;
 }
 
 export class ChangeUserPasswordDto {

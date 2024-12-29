@@ -5,9 +5,9 @@ import { IsAuthController } from 'src/decorator/auth.decorator';
 import { RequestAuth } from 'src/dto/common-request.dto';
 import { ChangeUserPasswordDto, UpdateUserProfileDto } from 'src/dto/user-dto/update-user-profile.dto';
 import { User } from 'src/entities/user/user.entity';
+import { VocabularyView } from 'src/entities/vocabulary/vocabulary-view.entity';
 import { UserAction, UserSummary } from './user.permission.interface';
 import { UserService } from './user.service';
-import { VocabularyView } from 'src/entities/vocabulary/vocabulary-view.entity';
 
 @IsAuthController(`${EntityNameConst.USER}`, true)
 export class UserPermissionController implements Record<UserAction, any> {

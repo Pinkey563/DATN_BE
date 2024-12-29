@@ -8,7 +8,7 @@ import { CacheUser } from 'src/dto/common-request.dto';
 import { PageDto } from 'src/dto/paginate.dto';
 import { LoginDto } from 'src/dto/user-dto/login.dto';
 import { RegisterDto } from 'src/dto/user-dto/register.dto';
-import { SearchUserDto } from 'src/dto/user-dto/search-user.dto';
+import { SearchUserDto, SearchUserStatisticDto } from 'src/dto/user-dto/search-user.dto';
 import { ChangeUserPasswordDto, UpdateUserProfileDto } from 'src/dto/user-dto/update-user-profile.dto';
 import { Upload } from 'src/entities/upload/upload.entity';
 import { UserLog } from 'src/entities/user/user-log.entity';
@@ -30,6 +30,7 @@ import { StudentProfile } from './../../entities/user/student-profile.entity';
 import { MailService } from './MailService';
 import { Vocabulary } from 'src/entities/vocabulary/vocabulary.entity';
 import { VocabularyView } from 'src/entities/vocabulary/vocabulary-view.entity';
+import { UserStatistic } from 'src/entities/user/user-statistic.entity';
 
 @Injectable()
 export class UserService {
@@ -49,6 +50,10 @@ export class UserService {
         status: true,
         address: true,
         birthday: true,
+        schoolName: true,
+        district: true,
+        city: true,
+        ward: true,
       },
       where: { id: userId, role: { code: Not(RoleCode.ADMIN) }, ...whereCustom },
       relations: { role: true },
@@ -182,6 +187,8 @@ export class UserService {
       user.phoneNumber = body.phoneNumber;
     }
 
+    CondUtil.saveIfChanged(user, body, ['schoolName', 'houseStreet', 'ward', 'district', 'city']);
+
     const permission = await PermissionHelper.getPermissionByCode(permissionCode);
     if (!permission) throw new App404Exception('permissionCode', { permissionCode });
 
@@ -276,5 +283,25 @@ export class UserService {
     vocabularyView.lastViewedAt = new Date().toISOString();
     vocabularyView.viewCount = vocabularyView.viewCount + 1;
     await vocabularyView.save();
+  };
+
+  getStatisticsById = async (userId) => {
+    const user = await User.findOneBy({ id: userId });
+    if (!user) throw new App404Exception('userId', { userId });
+
+    const userStatistic = await UserStatistic.findOneBy({ userId });
+    if (!userStatistic) throw new App404Exception('userId', { userId });
+
+    return userStatistic;
+  };
+
+  searchStatistics = async (query: SearchUserStatisticDto) => {
+    const [data, itemCount] = await UserStatistic.findAndCount({
+      where: UserHelper.getFilterSearchUserStatistic(query),
+      order: QueryUtil.getSort(query.orderBy, query.sortBy),
+      skip: query.skip,
+      take: query.take,
+    });
+    return GenerateUtil.paginate({ data, itemCount, query });
   };
 }

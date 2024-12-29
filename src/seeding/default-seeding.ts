@@ -21,7 +21,7 @@ import {
 } from './data/user-data';
 import { seedingEntity } from './seeding-utils';
 import { VocabularyAction } from 'src/api/vocabulary/vocabulary.permission.interface';
-import { TopicAction } from 'src/api/topic/Topic-permission.interface';
+import { TopicAction } from 'src/api/topic/topic-permission.interface';
 import { QuestionAction } from 'src/api/question/question-permission.interface';
 import { ExamAction } from 'src/api/exam/exam-permission.interface';
 
