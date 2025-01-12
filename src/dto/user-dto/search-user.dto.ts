@@ -24,3 +24,12 @@ export class SearchUserStatisticDto extends PageOptionsDto {
   @Transform(({ value }) => value.trim())
   readonly name: string;
 }
+
+export class SearchStudentDto extends PageOptionsDto {
+  @IsSwaggerString({}, false)
+  @Transform(({ value }) => value.trim())
+  readonly name: string;
+
+  @IsSwaggerNumber({}, false)
+  readonly classRoomId: number;
+}

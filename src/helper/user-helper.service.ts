@@ -1,6 +1,9 @@
-import { SearchUserDto, SearchUserStatisticDto } from 'src/dto/user-dto/search-user.dto';
+import { SearchStudentDto, SearchUserDto, SearchUserStatisticDto } from 'src/dto/user-dto/search-user.dto';
+import { ClassStudent } from 'src/entities/class/class-student.entity';
+import { ExamAttempt } from 'src/entities/exam/exam-attempt.entity';
 import { UserStatistic } from 'src/entities/user/user-statistic.entity';
 import { User } from 'src/entities/user/user.entity';
+import { VocabularyView } from 'src/entities/vocabulary/vocabulary-view.entity';
 import { ConditionWhere } from 'src/types/query.type';
 import { FindOptionsSelect, ILike } from 'typeorm';
 
@@ -28,6 +31,16 @@ export class UserHelper {
     return { ...userWhere };
   };
 
+  static getFilterSearchStudent = (q: SearchStudentDto): ConditionWhere<ClassStudent> => {
+    let userWhere: ConditionWhere<ClassStudent> = {};
+    userWhere = {
+      ...(q.name && { name: ILike(`%${q.name}%`) }),
+      classroom: { id: q.classRoomId },
+    };
+
+    return { ...userWhere };
+  };
+
   static generateStudentCode(studentId: number) {
     const year = new Date().getFullYear();
     const studentCode = `${year}${studentId.toString().padStart(4, '0')}`;
@@ -44,4 +57,58 @@ export class UserHelper {
 
     return { ...where };
   }
+
+  static handleUserStatistic = async (userId) => {
+    await this.retryViewVocabulary(userId);
+    await this.retryClassJoined(userId);
+    await this.retryTestCompleted(userId);
+    await this.retryAverageScore(userId);
+  };
+
+  static retryViewVocabulary = async (userId) => {
+    const userStatistic = await this.findOrCreateUserStatistic(userId);
+    const viewCount = await VocabularyView.createQueryBuilder('vocabularyView')
+      .select('sum(vocabularyView.viewCount)', 'viewCount')
+      .where('vocabularyView.userId = :userId', { userId })
+      .getRawOne();
+
+    userStatistic.vocabularyViews = Number(viewCount.viewCount || 0);
+    return await userStatistic.save();
+  };
+
+  static retryClassJoined = async (userId) => {
+    const userStatistic = await this.findOrCreateUserStatistic(userId);
+    const classJoinedCount = await ExamAttempt.createQueryBuilder('examAttempt')
+      .innerJoinAndSelect('examAttempt.exam', 'exam')
+      .select('exam.classRoomId', 'classRoomId')
+      .addSelect('COUNT(examAttempt.id)', 'attemptCount')
+      .where('examAttempt.studentId = :userId', { userId })
+      .groupBy('exam.classRoomId')
+      .getRawMany();
+    userStatistic.totalClassesJoined = classJoinedCount.length;
+    return await userStatistic.save();
+  };
+
+  static retryTestCompleted = async (userId) => {
+    const userStatistic = await this.findOrCreateUserStatistic(userId);
+    const testCompletedCount = await ExamAttempt.countBy({ studentId: userId, isFinished: true });
+    userStatistic.testsCompleted = testCompletedCount;
+    return await userStatistic.save();
+  };
+
+  static retryAverageScore = async (userId) => {
+    const userStatistic = await this.findOrCreateUserStatistic(userId);
+    const averageScore = await ExamAttempt.createQueryBuilder('examAttempt')
+      .select('AVG(examAttempt.score)', 'averageScore')
+      .where('examAttempt.studentId = :userId', { userId })
+      .getRawOne();
+    userStatistic.averageScore = averageScore.averageScore || 0;
+    return await userStatistic.save();
+  };
+
+  static findOrCreateUserStatistic = async (userId) => {
+    const userStatistic = await UserStatistic.findOneBy({ userId });
+    if (userStatistic) return userStatistic;
+    return await UserStatistic.create({ userId }).save();
+  };
 }

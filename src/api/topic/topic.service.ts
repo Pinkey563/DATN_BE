@@ -37,7 +37,7 @@ export class TopicService {
         },
       },
       where: TopicHelper.getFilterSearchTopic(query),
-      relations: { classroom: true },
+      relations: { classroom: true, creator: true },
       order: QueryUtil.getSort(query.orderBy, query.sortBy),
       skip: query.skip,
       take: query.take,

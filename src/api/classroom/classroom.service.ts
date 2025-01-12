@@ -179,6 +179,11 @@ export class ClassroomService {
     const student = await User.findOne({ where: { studentProfile: { studentCode: body.studentCode } } });
     if (!student) throw new App404Exception('userId', { userId: body.studentCode });
 
+    const classStudentExist = await ClassStudent.findOne({
+      where: { studentId: student.id },
+    });
+    if (classStudentExist) throw new AppExistedException('studentId', { studentId: body.studentCode });
+
     const classStudent = new ClassStudent();
 
     classStudent.classroomId = classroom.id;
@@ -201,5 +206,21 @@ export class ClassroomService {
 
     await classStudent.remove();
     return true;
+  };
+
+  updateStudentInClass = async (id: number, user: CacheUser, body, permissionCode): Promise<any> => {
+    const classroom = await ClassRoom.findOne({ where: { id } });
+    if (!classroom) throw new App404Exception('id', { id });
+
+    const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
+    if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
+
+    const student = await User.findOne({ where: { studentProfile: { studentCode: body.studentCode } } });
+    const classStudent = await ClassStudent.findOne({ where: { studentId: student.id } });
+    if (!classStudent) throw new App404Exception('studentId', { studentId: body.studentCode });
+
+    classStudent.classroomId = id;
+
+    return await classStudent.save();
   };
 }

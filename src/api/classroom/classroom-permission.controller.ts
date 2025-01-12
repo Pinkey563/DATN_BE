@@ -51,6 +51,15 @@ export class ClassRoomPermissionController implements Record<ClassRoomAction, an
     return await this.classroomService.updateById(id, req.user, body, ClassRoomAction.UPDATE_CLASS);
   }
 
+  @Put('/update-student-in-class/:id')
+  @ApiHandleResponse({
+    summary: 'update student in class',
+    type: Boolean,
+  })
+  async updateStudentInClass(@Req() req: RequestAuth, @Param('id') id: number, @Body() body: { studentCode: number }) {
+    return await this.classroomService.updateStudentInClass(id, req.user, body, ClassRoomAction.JOIN_CLASS);
+  }
+
   @Delete('/:id')
   @ApiHandleResponse({
     summary: ClassRoomSummary.DELETE_CLASS,

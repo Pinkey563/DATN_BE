@@ -19,6 +19,12 @@ export class UserPermissionController implements Record<UserAction, any> {
     return await this.userService.getProfile(req.user);
   }
 
+  @Get('/class-joined')
+  @ApiHandleResponse({ type: User, summary: 'Get class joined' })
+  async getClassJoined(@Req() req: RequestAuth) {
+    return await this.userService.getClassJoined(req.user);
+  }
+
   @Put('/profile')
   @ApiHandleResponse({ type: User, summary: UserSummary.GetMyProfile })
   async [UserAction.UpdateMyProfile](@Req() req: RequestAuth, @Body() body: UpdateUserProfileDto) {

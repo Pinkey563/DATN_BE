@@ -4,15 +4,28 @@ import { ApiHandleResponse } from 'src/decorator/api.decorator';
 import { IsAuthController } from 'src/decorator/auth.decorator';
 import { LoginResponse } from 'src/dto/common-response.dto';
 import { LoginDto } from 'src/dto/user-dto/login.dto';
-import { SearchUserDto, SearchUserStatisticDto } from 'src/dto/user-dto/search-user.dto';
+import { SearchStudentDto, SearchUserDto, SearchUserStatisticDto } from 'src/dto/user-dto/search-user.dto';
 import { User } from 'src/entities/user/user.entity';
 import { UserService } from './user.service';
 import { RegisterDto, VerifyEmailDto } from 'src/dto/user-dto/register.dto';
 import { UserStatistic } from 'src/entities/user/user-statistic.entity';
+import { ExamAttempt } from 'src/entities/exam/exam-attempt.entity';
 
 @IsAuthController(EntityNameConst.USER, false)
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get('/health-check')
+  async healthCheck() {
+    try {
+      const averageScore = await ExamAttempt.createQueryBuilder('examAttempt')
+        .select('AVG(examAttempt.score)', 'averageScore')
+        .where('examAttempt.studentId = :userId', { userId: 2 })
+        .getRawOne();
+
+      console.log('Average Score:', averageScore.averageScore);
+    } catch (error) {}
+  }
 
   @Post('/login')
   @ApiHandleResponse({
@@ -21,6 +34,12 @@ export class UserController {
   })
   async login(@Body() body: LoginDto) {
     return await this.userService.login(body);
+  }
+
+  @Get('/student-list')
+  @ApiHandleResponse({ type: User, summary: 'Get class joined' })
+  async getStudentList(@Query() query: SearchStudentDto) {
+    return await this.userService.getStudentList(query);
   }
 
   @Get('/search')

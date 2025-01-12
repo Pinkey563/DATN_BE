@@ -40,6 +40,7 @@ const PermissionUserRoleCode = [
   UserAction.UpdateMyProfile,
   UploadAction.File,
   UploadAction.Image,
+  ...Object.values(ExamAction),
 ];
 
 const PermissionTeacherRoleCode = [

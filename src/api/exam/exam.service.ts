@@ -79,6 +79,7 @@ export class ExamService {
         },
       },
       where: {
+        studentId: userId,
         ...ExamHelper.getFilterSearchExamAttempt(query),
       },
       relations: { exam: { classroom: true } },
