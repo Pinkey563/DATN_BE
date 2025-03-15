@@ -68,7 +68,10 @@ export class UserHelper {
   static retryViewVocabulary = async (userId) => {
     const userStatistic = await this.findOrCreateUserStatistic(userId);
     const viewCount = await VocabularyView.createQueryBuilder('vocabularyView')
-      .select('sum(vocabularyView.viewCount)', 'viewCount')
+      // .select('sum(vocabularyView.viewCount)', 'viewCount')
+      // .where('vocabularyView.userId = :userId', { userId })
+      // .getRawOne();
+      .select('COUNT(DISTINCT vocabularyView.vocabularyId)', 'viewCount') // Đếm số lượng từ duy nhất đã xem
       .where('vocabularyView.userId = :userId', { userId })
       .getRawOne();
 
@@ -78,14 +81,16 @@ export class UserHelper {
 
   static retryClassJoined = async (userId) => {
     const userStatistic = await this.findOrCreateUserStatistic(userId);
-    const classJoinedCount = await ExamAttempt.createQueryBuilder('examAttempt')
-      .innerJoinAndSelect('examAttempt.exam', 'exam')
-      .select('exam.classRoomId', 'classRoomId')
-      .addSelect('COUNT(examAttempt.id)', 'attemptCount')
-      .where('examAttempt.studentId = :userId', { userId })
-      .groupBy('exam.classRoomId')
-      .getRawMany();
-    userStatistic.totalClassesJoined = classJoinedCount.length;
+    const classJoinedCount = await ClassStudent.createQueryBuilder('classStudent')
+      .where('classStudent.studentId = :userId', { userId })
+      .getCount(); // Lấy số lượng bản ghi thay vì `getRawMany()`
+      // .innerJoinAndSelect('examAttempt.exam', 'exam')
+      // .select('exam.classRoomId', 'classRoomId')
+      // .addSelect('COUNT(examAttempt.id)', 'attemptCount')
+      // .where('examAttempt.studentId = :userId', { userId })
+      // .groupBy('exam.classRoomId')
+      // .getRawMany();
+    userStatistic.totalClassesJoined = classJoinedCount;
     return await userStatistic.save();
   };
 

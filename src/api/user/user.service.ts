@@ -11,6 +11,7 @@ import { RegisterDto } from 'src/dto/user-dto/register.dto';
 import { SearchStudentDto, SearchUserDto, SearchUserStatisticDto } from 'src/dto/user-dto/search-user.dto';
 import { ChangeUserPasswordDto, UpdateUserProfileDto } from 'src/dto/user-dto/update-user-profile.dto';
 import { ClassStudent } from 'src/entities/class/class-student.entity';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { ExamAttempt } from 'src/entities/exam/exam-attempt.entity';
 import { Upload } from 'src/entities/upload/upload.entity';
 import { UserLog } from 'src/entities/user/user-log.entity';
@@ -301,6 +302,7 @@ export class UserService {
     await vocabularyView.save();
   };
 
+  // Thống kê
   getStatisticsById = async (userId) => {
     const user = await User.findOneBy({ id: userId });
     if (!user) throw new App404Exception('userId', { userId });
@@ -322,21 +324,33 @@ export class UserService {
   };
 
   getClassJoined = async (user) => {
-    const classJoinedCount = await ExamAttempt.createQueryBuilder('examAttempt')
-      .innerJoinAndSelect('examAttempt.exam', 'exam')
-      .innerJoinAndSelect('exam.classroom', 'classRoom')
-      .select('exam.classRoomId', 'classRoomId')
-      .addSelect('COUNT(examAttempt.id)', 'attemptCount')
-      .addSelect('classRoom.name', 'name')
-      .addSelect('classRoom.thumbnailPath', 'thumbnailPath')
-      .addSelect('classRoom.classCode', 'classCode')
-      .where('examAttempt.studentId = :userId', { userId: user.userId })
-      .groupBy('exam.classRoomId')
-      .addGroupBy('classRoom.name')
-      .addGroupBy('classRoom.thumbnailPath')
-      .addGroupBy('classRoom.classCode')
-      .getRawMany();
-
+    // const classJoinedCount = await ExamAttempt.createQueryBuilder('examAttempt')
+    //   .innerJoinAndSelect('examAttempt.exam', 'exam')
+    //   .innerJoinAndSelect('exam.classroom', 'classRoom')
+    //   .select('exam.classRoomId', 'classRoomId')
+    //   .addSelect('COUNT(examAttempt.id)', 'attemptCount')
+    //   .addSelect('classRoom.name', 'name')
+    //   .addSelect('classRoom.thumbnailPath', 'thumbnailPath')
+    //   .addSelect('classRoom.classCode', 'classCode')
+    //   .where('examAttempt.studentId = :userId', { userId: user.userId })
+    //   .groupBy('exam.classRoomId')
+    //   .addGroupBy('classRoom.name')
+    //   .addGroupBy('classRoom.thumbnailPath')
+    //   .addGroupBy('classRoom.classCode')
+    //   .getRawMany();
+      const classJoinedCount = await ClassStudent.createQueryBuilder('classStudent')
+        .innerJoinAndSelect('classStudent.classroom', 'classRoom') // Join để lấy thông tin lớp học
+        .select('classRoom.id', 'classRoomId')
+        .addSelect('classRoom.name', 'name')
+        .addSelect('classRoom.thumbnailPath', 'thumbnailPath')
+        .addSelect('classRoom.classCode', 'classCode')
+        .where('classStudent.studentId = :userId', { userId: user.userId }) // Chỉ lấy lớp học của học sinh
+        .groupBy('classRoom.id')
+        .addGroupBy('classRoom.name')
+        .addGroupBy('classRoom.thumbnailPath')
+        .addGroupBy('classRoom.classCode')
+        .getRawMany();
+    
     return classJoinedCount;
   };
 
