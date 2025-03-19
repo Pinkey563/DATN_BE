@@ -2,7 +2,7 @@ import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
 import { AppStatus } from 'src/types/common';
 import { StringUtil } from 'src/utils/string';
-import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
+import { PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { ClassRoom } from '../class/classroom.entity';
 import { AbstractTimeEntity } from '../entity.interface';
 import { EXAM } from '../exam/exam.entity';
@@ -17,6 +17,7 @@ import { ClassStudent } from '../class/class-student.entity';
 import { Gender } from 'src/constant/enum-common';
 import { StudentProfile } from './student-profile.entity';
 import { Topic } from '../vocabulary/topic.entity';
+import { UserStatistic } from './user-statistic.entity';
 
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
@@ -25,6 +26,9 @@ export enum UserStatus {
 
 @Entity(EntityNameConst.USER)
 export class User extends AbstractTimeEntity {
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'user_id' }) // Định nghĩa ID mới
+  userId: number;
+
   @DBColumn({
     name: 'username',
     type: 'varchar',
@@ -75,8 +79,8 @@ export class User extends AbstractTimeEntity {
   })
   address: string;
 
-  @DBColumn({ type: 'timestamptz', name: 'birthday', nullable: true })
-  birthday: string;
+  @DBColumn({ type: 'datetime', name: 'birth_day', precision: 6, nullable: true })
+  birthday:Date;
 
   @DBColumn({ type: 'enum', name: 'gender', enum: Gender, default: Gender.MALE })
   gender: Gender;
@@ -84,8 +88,11 @@ export class User extends AbstractTimeEntity {
   @DBColumn({ type: 'boolean', name: 'is_super_admin', default: false })
   isSupperAdmin: boolean;
 
-  @DBColumn({ type: 'int', name: 'role_id', nullable: true })
-  roleId: number;
+  // @DBColumn({ type: 'bigint', name: 'code', nullable: true })
+  // code: number;
+
+  @DBColumn({ type: 'varchar', name: 'code', nullable: true })
+  code: string;
 
   @DBColumn({ name: 'slug', type: 'varchar', nullable: true })
   slug: string;
@@ -95,7 +102,7 @@ export class User extends AbstractTimeEntity {
 
   // RELATIONSHIP
   @ManyToOne(() => Role, (role) => role.users, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'role_id' })
+  @JoinColumn({ name: 'code' })
   role: Role;
 
   @OneToMany(() => Upload, (upload) => upload.creator)
@@ -130,6 +137,9 @@ export class User extends AbstractTimeEntity {
 
   @OneToMany(() => Topic, (topic) => topic.creator)
   topics: Topic[];
+
+  @OneToOne(() => UserStatistic, (userStatistic) => userStatistic.user)
+  userStatistic: UserStatistic;
 
   @DBColumn({
     name: 'school_name',

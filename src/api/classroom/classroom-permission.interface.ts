@@ -21,6 +21,6 @@ export const ClassRoomSummary: Record<keyof typeof ClassRoomAction, string> = {
 };
 
 export const ClassRoomPermission: Partial<Permission>[] = Object.keys(ClassRoomAction).map((key) => ({
-  code: ClassRoomAction[key],
+  roleCode: ClassRoomAction[key],
   name: ClassRoomSummary[key],
 }));

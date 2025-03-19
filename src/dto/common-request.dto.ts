@@ -18,8 +18,8 @@ export class JWTPayload {
 export interface CacheUser {
   userId: number;
   username: string;
-  roleId: number;
-  roleCode: string;
+  // code: number;
+  code: string;
   actions: string[];
   isSupperAdmin: boolean;
 }

@@ -28,7 +28,7 @@ export class ExamService {
   search = async (query: SearchExamDto): Promise<PageDto<EXAM>> => {
     const [data, itemCount] = await EXAM.findAndCount({
       select: {
-        id: true,
+        examId: true,
         name: true,
         classRoomId: true,
         description: true,
@@ -37,7 +37,7 @@ export class ExamService {
         numberOfQuestions: true,
         private: true,
         classroom: {
-          id: true,
+          classroomId: true,
           name: true,
           classLevel: true,
         },
@@ -60,19 +60,19 @@ export class ExamService {
 
     const [data, itemCount] = await ExamAttempt.findAndCount({
       select: {
-        id: true,
+        userExamId: true,
         score: true,
         createdAt: true,
         studentId: true,
         isFinished: true,
         exam: {
-          id: true,
+          examId: true,
           name: true,
           classRoomId: true,
           numberOfQuestions: true,
           private: true,
           classroom: {
-            id: true,
+            classroomId: true,
             name: true,
             classLevel: true,
           },
@@ -114,7 +114,7 @@ export class ExamService {
         const examQuestions = body.questionIds.map((questionId) => {
           const examQuestion = new ExamQuestion();
           examQuestion.questionId = questionId;
-          examQuestion.examId = exam.id;
+          examQuestion.examId = exam.examId;
           return examQuestion;
         });
 
@@ -123,35 +123,35 @@ export class ExamService {
       }
     });
 
-    return await this.getById(exam.id);
+    return await this.getById(exam.examId);
   }
 
-  getById = async (id: number): Promise<EXAM> => {
+  getById = async (examId: number): Promise<EXAM> => {
     const exam = await EXAM.findOne({
       select: {
         classroom: {
-          id: true,
+          classroomId: true,
           name: true,
           classLevel: true,
         },
         creator: {
-          id: true,
+          createdAt: true,
           name: true,
         },
         questions: {
-          id: true,
+          questionId: true,
         },
       },
-      where: { id },
+      where: { examId },
       relations: { classroom: true, creator: true, questions: true },
     });
-    if (!exam) throw new App404Exception('id', { id });
+    if (!exam) throw new App404Exception('id', { examId });
     return exam;
   };
 
-  updateById = async (id: number, user: CacheUser, body: UpdateExamDto, permissionCode: string): Promise<EXAM> => {
-    const exam = await EXAM.findOne({ where: { id }, relations: { questions: true } });
-    if (!exam) throw new App404Exception('id', { id });
+  updateById = async (examId: number, user: CacheUser, body: UpdateExamDto, permissionCode: string): Promise<EXAM> => {
+    const exam = await EXAM.findOne({ where: { examId }, relations: { questions: true } });
+    if (!exam) throw new App404Exception('id', { examId });
 
     if (body.name != exam.name) {
       const isExistByName = await HelperUtils.existByName(EXAM, body.name, 'name');
@@ -162,7 +162,7 @@ export class ExamService {
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
 
     const oldExam = JSON.stringify(exam);
-    const oldQuestion = JSON.stringify(exam.questions.map((q) => q.id));
+    const oldQuestion = JSON.stringify(exam.questions.map((q) => q.examId));
 
     CondUtil.saveIfChanged(exam, body, ['name', 'thumbnailPath', 'numberOfQuestions', 'description']);
     const audit = new Audit();
@@ -176,30 +176,30 @@ export class ExamService {
     const questionIdsToAdd = body.questionIds.filter((id) => !currentQuestionIds.includes(id));
 
     await Promise.all([
-      questionIdsToDelete.length && ExamQuestion.delete({ examId: exam.id, questionId: In(questionIdsToDelete) }),
+      questionIdsToDelete.length && ExamQuestion.delete({ examId: exam.examId, questionId: In(questionIdsToDelete) }),
       questionIdsToAdd.length &&
         questionIdsToAdd.map(async (questionId) => {
           const examQuestion = new ExamQuestion();
           examQuestion.questionId = questionId;
-          examQuestion.examId = exam.id;
+          examQuestion.examId = exam.examId;
           await examQuestion.save();
         }),
     ]);
     exam.numberOfQuestions = body.questionIds.length;
     await exam.save();
-    return await this.getById(exam.id);
+    return await this.getById(exam.examId);
   };
 
-  deleteById = async (id: number, user: CacheUser, permissionCode): Promise<any> => {
+  deleteById = async (examId: number, user: CacheUser, permissionCode): Promise<any> => {
     let exam;
     const userRole = await RoleHelper.getRoleByUserId(user.userId);
-    if (userRole.code === 'ADMIN') {
-      exam = await EXAM.findOne({ where: { id } });
+    if (userRole.roleCode === 'ADMIN') {
+      exam = await EXAM.findOne({ where: { examId } });
     } else {
-      exam = await EXAM.findOne({ where: { id, creatorId: user.userId } });
+      exam = await EXAM.findOne({ where: { examId, creatorId: user.userId } });
     }
 
-    if (!exam) throw new App404Exception('id', { id });
+    if (!exam) throw new App404Exception('id', { examId });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
@@ -230,17 +230,17 @@ export class ExamService {
     });
   };
 
-  deleteExamAttempt = async (user: CacheUser, id, permissionCode) => {
+  deleteExamAttempt = async (user: CacheUser, userExamId, permissionCode) => {
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
 
     let examAttempt;
-    if (user.roleCode === 'ADMIN') {
-      examAttempt = await ExamAttempt.findOneBy({ id });
+    if (user.code === 'ADMIN') {
+      examAttempt = await ExamAttempt.findOneBy({ userExamId });
     } else {
-      examAttempt = await ExamAttempt.findOneBy({ id, studentId: user.userId });
+      examAttempt = await ExamAttempt.findOneBy({ userExamId, studentId: user.userId });
     }
-    if (!examAttempt) throw new App404Exception('id', { id });
+    if (!examAttempt) throw new App404Exception('id', { userExamId });
 
     await examAttempt.remove();
   };
@@ -295,8 +295,8 @@ export class ExamService {
             const studentAnswer = new StudentAnswer();
             studentAnswer.questionId = item.questionId;
             studentAnswer.selectedAnswers = [...item.selectedAnswers];
-            studentAnswer.answeredAt = new Date().toISOString();
-            studentAnswer.examAttemptId = examAttempt.id;
+            studentAnswer.answeredAt = new Date();
+            studentAnswer.examAttemptId = examAttempt.userExamId;
             await studentAnswer.save();
           }),
         );
@@ -311,7 +311,7 @@ export class ExamService {
             });
 
             studentAnswer.selectedAnswers = [...item.selectedAnswers];
-            studentAnswer.answeredAt = new Date().toISOString();
+            studentAnswer.answeredAt = new Date();
             await studentAnswer.save();
           }),
         );

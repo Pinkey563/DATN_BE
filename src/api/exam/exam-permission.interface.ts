@@ -19,6 +19,6 @@ export const ExamSummary: Record<keyof typeof ExamAction, string> = {
 };
 
 export const ExamPermission: Partial<Permission>[] = Object.keys(ExamAction).map((key) => ({
-  code: ExamAction[key],
+  roleCode: ExamAction[key],
   name: ExamSummary[key],
 }));

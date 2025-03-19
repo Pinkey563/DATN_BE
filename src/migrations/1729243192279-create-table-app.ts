@@ -13,9 +13,9 @@ export class CreateTableApp1729243192279 implements MigrationInterface {
       MigrationConst.updatedAtColumn,
       MigrationConst.varcharColumn('title'),
       MigrationConst.varcharColumn('description', { isNullable: true }),
-      MigrationConst.intColumn('creator_id', { isNullable: true }),
-      MigrationConst.intColumn('topic_id', { isNullable: true }),
-      MigrationConst.intColumn('classroom_id', { isNullable: true }),
+      MigrationConst.bigIntColumn('creator_id', { isNullable: true }),
+      MigrationConst.bigIntColumn('topic_id', { isNullable: true }),
+      MigrationConst.bigIntColumn('classroom_id', { isNullable: true }),
       MigrationConst.enumColumn('status', AppStatus, { default: `'${AppStatus.PENDING}'` }),
       MigrationConst.enumColumn('vocabulary_type', VocabularyTypeConst, { default: `'${VocabularyTypeConst.WORD}'` }),
       MigrationConst.varcharColumn('slug', { isNullable: true }),
@@ -43,7 +43,7 @@ export class CreateTableApp1729243192279 implements MigrationInterface {
       MigrationConst.varcharColumn('name'),
       MigrationConst.varcharColumn('description', { isNullable: true }),
       MigrationConst.varcharColumn('slug', { isNullable: true }),
-      MigrationConst.intColumn('teacher_id', { isNullable: true }),
+      MigrationConst.bigIntColumn('teacher_id', { isNullable: true }),
       MigrationConst.varcharColumn('thumbnail_path', { isNullable: true }),
       MigrationConst.varcharColumn('class_code', { isNullable: true }),
       MigrationConst.booleanColumn('is_teacher_created', { default: false }),
@@ -57,8 +57,8 @@ export class CreateTableApp1729243192279 implements MigrationInterface {
       MigrationConst.idPrimaryColumn,
       MigrationConst.createdAtColumn,
       MigrationConst.updatedAtColumn,
-      MigrationConst.intColumn('student_id'),
-      MigrationConst.intColumn('classroom_id'),
+      MigrationConst.bigIntColumn('student_id'),
+      MigrationConst.bigIntColumn('classroom_id'),
     ],
   });
 
@@ -70,8 +70,8 @@ export class CreateTableApp1729243192279 implements MigrationInterface {
       MigrationConst.updatedAtColumn,
       MigrationConst.varcharColumn('title'),
       MigrationConst.varcharColumn('description', { isNullable: true }),
-      MigrationConst.intColumn('creator_id', { isNullable: true }),
-      MigrationConst.intColumn('classroom_id', { isNullable: true }),
+      MigrationConst.bigIntColumn('creator_id', { isNullable: true }),
+      MigrationConst.bigIntColumn('classroom_id', { isNullable: true }),
       MigrationConst.enumColumn('status', AppStatus, { default: `'${AppStatus.PENDING}'` }),
       MigrationConst.varcharColumn('slug', { isNullable: true }),
       MigrationConst.varcharColumn('thumbnail_path', { isNullable: true }),
@@ -84,8 +84,8 @@ export class CreateTableApp1729243192279 implements MigrationInterface {
       MigrationConst.idPrimaryColumn,
       MigrationConst.createdAtColumn,
       MigrationConst.updatedAtColumn,
-      MigrationConst.intColumn('exam_id'),
-      MigrationConst.intColumn('student_id'),
+      MigrationConst.bigIntColumn('exam_id'),
+      MigrationConst.bigIntColumn('student_id'),
     ],
   });
 
@@ -97,9 +97,9 @@ export class CreateTableApp1729243192279 implements MigrationInterface {
       MigrationConst.updatedAtColumn,
       MigrationConst.varcharColumn('title'),
       MigrationConst.varcharColumn('description', { isNullable: true }),
-      MigrationConst.intColumn('creator_id', { isNullable: true }),
-      MigrationConst.intColumn('topic_id', { isNullable: true }),
-      MigrationConst.intColumn('classroom_id', { isNullable: true }),
+      MigrationConst.bigIntColumn('creator_id', { isNullable: true }),
+      MigrationConst.bigIntColumn('topic_id', { isNullable: true }),
+      MigrationConst.bigIntColumn('classroom_id', { isNullable: true }),
       MigrationConst.enumColumn('status', AppStatus, { default: `'${AppStatus.PENDING}'` }),
       MigrationConst.varcharColumn('slug', { isNullable: true }),
       MigrationConst.varcharColumn('images_path', { isNullable: true, isArray: true }),
@@ -113,10 +113,10 @@ export class CreateTableApp1729243192279 implements MigrationInterface {
       MigrationConst.idPrimaryColumn,
       MigrationConst.createdAtColumn,
       MigrationConst.updatedAtColumn,
-      MigrationConst.intColumn('answer_id'),
-      MigrationConst.intColumn('question_id'),
-      MigrationConst.intColumn('exam_attempt_id'),
-      MigrationConst.timestamptzColumn('answered_at', { isNullable: true }),
+      MigrationConst.bigIntColumn('answer_id'),
+      MigrationConst.bigIntColumn('question_id'),
+      MigrationConst.bigIntColumn('exam_attempt_id'),
+      MigrationConst.timestampColumn('answered_at', { isNullable: true }),
     ],
   });
 
@@ -127,7 +127,7 @@ export class CreateTableApp1729243192279 implements MigrationInterface {
       MigrationConst.createdAtColumn,
       MigrationConst.updatedAtColumn,
       MigrationConst.varcharColumn('content'),
-      MigrationConst.intColumn('question_id'),
+      MigrationConst.bigIntColumn('question_id'),
     ],
   });
 
@@ -136,8 +136,8 @@ export class CreateTableApp1729243192279 implements MigrationInterface {
     columns: [
       MigrationConst.idPrimaryColumn,
       MigrationConst.createdAtColumn,
-      MigrationConst.intColumn('vocabulary_id'),
-      MigrationConst.intColumn('student_id'),
+      MigrationConst.bigIntColumn('vocabulary_id'),
+      MigrationConst.bigIntColumn('student_id'),
     ],
   });
 

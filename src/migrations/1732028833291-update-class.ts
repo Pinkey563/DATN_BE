@@ -9,7 +9,7 @@ export class UpdateClass1732028833291 implements MigrationInterface {
     columns: [
       MigrationConst.idPrimaryColumn,
       MigrationConst.createdAtColumn,
-      MigrationConst.intColumn('user_id', { isNullable: false }),
+      MigrationConst.bigIntColumn('user_id', { isNullable: false }),
       MigrationConst.varcharColumn('student_code', { isNullable: false }),
     ],
   });

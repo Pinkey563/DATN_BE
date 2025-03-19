@@ -2,7 +2,7 @@ import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
 import { AppStatus } from 'src/types/common';
 import { StringUtil } from 'src/utils/string';
-import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ClassRoom } from '../class/classroom.entity';
 import { AbstractTimeEntity } from '../entity.interface';
 import { User } from '../user/user.entity';
@@ -11,6 +11,9 @@ import { ExamQuestion } from './exam-question.entity';
 
 @Entity(EntityNameConst.EXAM)
 export class EXAM extends AbstractTimeEntity {
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'exam_id' }) // Định nghĩa ID mới
+  examId: number;
+
   @DBColumn({
     name: 'name',
     type: 'varchar',
@@ -25,8 +28,8 @@ export class EXAM extends AbstractTimeEntity {
   description: string;
 
   @DBColumn({
-    name: 'classroom_id',
-    type: 'int',
+    name: 'class_room_id',
+    type: 'bigint',
     nullable: true,
   })
   classRoomId: number;
@@ -36,6 +39,12 @@ export class EXAM extends AbstractTimeEntity {
     type: 'int',
   })
   creatorId: number;
+
+  @DBColumn({
+    name: 'created_by',
+    type: 'varchar',
+  })
+  createdBy: string;
 
   @DBColumn({
     name: 'number_of_questions',
@@ -52,10 +61,16 @@ export class EXAM extends AbstractTimeEntity {
   thumbnailPath: string;
 
   @DBColumn({
-    name: 'private',
-    type: 'boolean',
-    default: false,
-  })
+    name: 'is_private',
+    type: 'bit',
+  //   default: 0,
+  // })
+  // private: Buffer;
+  transformer: {
+    to: (value: boolean) => value ? Buffer.from([1]) : Buffer.from([0]), // Lưu vào DB
+    from: (value: Buffer) => value[0] === 1, // Lấy từ DB
+  },
+})
   private: boolean;
 
   @DBColumn({ name: 'slug', type: 'varchar', nullable: true })
@@ -69,13 +84,13 @@ export class EXAM extends AbstractTimeEntity {
   @ManyToOne(() => User, (user) => user.exams, {
     onDelete: 'SET NULL',
   })
-  @JoinColumn({ name: 'creator_id' })
+  @JoinColumn({ name: 'created_by' })
   creator: User;
 
   @ManyToOne(() => ClassRoom, (classRoom) => classRoom.exams, {
     onDelete: 'SET NULL',
   })
-  @JoinColumn({ name: 'classroom_id' })
+  @JoinColumn({ name: 'class_room_id' })
   classroom: ClassRoom;
 
   @OneToMany(() => ExamAttempt, (examAttempt) => examAttempt.exam)

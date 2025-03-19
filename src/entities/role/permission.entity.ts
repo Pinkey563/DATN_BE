@@ -1,9 +1,11 @@
-import { Column, Entity, OneToMany } from 'typeorm';
-import { AbstractIdEntity } from '../entity.interface';
+import { Column, PrimaryGeneratedColumn, Entity, OneToMany } from 'typeorm';
+import { AbstractTimeEntity } from '../entity.interface';
 import { RolePermission } from './role-permission.entity';
-
 @Entity()
-export class Permission extends AbstractIdEntity {
+export class Permission extends AbstractTimeEntity {
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'permission_id' }) // Định nghĩa ID mới
+  permissionId: number;
+
   @Column({ type: 'varchar', name: 'code', unique: true })
   code: string;
 

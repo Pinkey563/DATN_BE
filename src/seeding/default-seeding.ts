@@ -58,9 +58,9 @@ const PermissionVolunteerRoleCode = [
   ...Object.values(QuestionAction),
 ];
 
-const seedingRolePermission = async (permissionCodes, roleCode) => {
+const seedingRolePermission = async (permissionCodes, code) => {
   console.log(`======== SEEDING ${RolePermission.name} =========`);
-  for (const code of permissionCodes) {
+  for (const roleCode of permissionCodes) {
     const role = await RoleHelper.getRoleByCode(roleCode);
     if (!role) {
       console.log(`======== ${Role.name} code ${roleCode} is not exist`);
@@ -73,14 +73,14 @@ const seedingRolePermission = async (permissionCodes, roleCode) => {
       continue;
     }
 
-    const rolePermission = await RolePermission.findOneBy({ roleId: role.id, permissionId: permission.id });
+    const rolePermission = await RolePermission.findOneBy({ code: role.roleCode, permissionId: permission.permissionId });
 
     if (rolePermission) {
-      console.log(`======== ${RolePermission.name} roleId-${role.id} permissionId-${permission.id} is exist =========`);
+      console.log(`======== ${RolePermission.name} code-${role.roleCode} permissionId-${permission.permissionId} is exist =========`);
       continue;
     }
 
-    await RolePermission.save({ roleId: role.id, permissionId: permission.id } as Partial<RolePermission>);
+    await RolePermission.save({ roleCoded: role.roleCode, permissionId: permission.permissionId } as Partial<RolePermission>);
   }
 };
 
@@ -101,31 +101,31 @@ const defaultSeeding = async () => {
 
   await seedingEntity(
     User,
-    DefaultAdminData.map((item) => ({ ...item, roleId: adminRole.id })),
+    DefaultAdminData.map((item) => ({ ...item, code: adminRole.roleCode })),
     'email',
   );
 
   await seedingEntity(
     User,
-    DefaultTeacherData.map((item) => ({ ...item, roleId: teacherRole.id })),
+    DefaultTeacherData.map((item) => ({ ...item, code: teacherRole.roleCode })),
     'email',
   );
 
   await seedingEntity(
     User,
-    DefaultStudentData.map((item) => ({ ...item, roleId: studentRole.id })),
+    DefaultStudentData.map((item) => ({ ...item, code: studentRole.roleCode })),
     'email',
   );
 
   await seedingEntity(
     User,
-    DefaultVolunteerData.map((item) => ({ ...item, roleId: volunteerRole.id })),
+    DefaultVolunteerData.map((item) => ({ ...item, code: volunteerRole.roleCode })),
     'email',
   );
 
   await seedingEntity(
     User,
-    adminCodeServiceData.map((item) => ({ ...item, roleId: admCodeServiceRole.id })),
+    adminCodeServiceData.map((item) => ({ ...item, code: admCodeServiceRole.roleCode })),
     'email',
   );
 

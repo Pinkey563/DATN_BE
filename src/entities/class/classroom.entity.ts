@@ -1,6 +1,6 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { BeforeUpdate, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
+import { BeforeUpdate, PrimaryGeneratedColumn, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { AbstractTimeEntity } from '../entity.interface';
 import { ClassStudent } from './class-student.entity';
 import { User } from '../user/user.entity';
@@ -14,8 +14,10 @@ import { Topic } from '../vocabulary/topic.entity';
 
 @Entity(EntityNameConst.CLASSROOM)
 export class ClassRoom extends AbstractTimeEntity {
+  @PrimaryGeneratedColumn({ type: 'bigint', name: 'class_room_id' }) // Định nghĩa ID mới
+  classroomId: number;
   @DBColumn({
-    name: 'name',
+    name: 'content',
     type: 'varchar',
   })
   name: string;
@@ -28,8 +30,15 @@ export class ClassRoom extends AbstractTimeEntity {
   thumbnailPath: string;
 
   @DBColumn({
+    name: 'image_location',
+    type: 'varchar',
+    nullable: true,
+  })
+  imageLocation: string;
+
+  @DBColumn({
     name: 'teacher_id',
-    type: 'int',
+    type: 'bigint',
     nullable: true,
   })
   teacherId: number;
