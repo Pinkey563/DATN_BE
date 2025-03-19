@@ -8,10 +8,10 @@ export class CreateUserLogTable1718510914190 implements MigrationInterface {
     columns: [
       MigrationConst.idPrimaryColumn,
       MigrationConst.createdAtColumn,
-      MigrationConst.jsonbColumn('metadata'),
+      MigrationConst.jsonColumn('metadata'),
       MigrationConst.varcharColumn('comment', { isNullable: true }),
-      MigrationConst.intColumn('user_id'),
-      MigrationConst.intColumn('permission_id'),
+      MigrationConst.bigIntColumn('user_id'),
+      MigrationConst.bigIntColumn('permission_id'),
     ],
   });
 

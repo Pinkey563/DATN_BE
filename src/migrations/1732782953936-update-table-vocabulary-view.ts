@@ -6,8 +6,8 @@ export class UpdateTableVocabularyView1732782953936 implements MigrationInterfac
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.renameColumn(EntityNameConst.VOCABULARY_VIEW, 'student_id', 'user_id');
     await queryRunner.addColumns(EntityNameConst.VOCABULARY_VIEW, [
-      new TableColumn(MigrationConst.timestamptzColumn('last_viewed_at', { isNullable: true })),
-      new TableColumn(MigrationConst.intColumn('view_count', { default: 0 })),
+      new TableColumn(MigrationConst.timestampColumn('last_viewed_at', { isNullable: true })),
+      new TableColumn(MigrationConst.bigIntColumn('view_count', { default: 0 })),
     ]);
   }
 

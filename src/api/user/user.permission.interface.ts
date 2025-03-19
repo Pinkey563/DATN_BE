@@ -15,6 +15,6 @@ export const UserSummary: Record<keyof typeof UserAction, string> = {
 };
 
 export const UserPermission: Partial<Permission>[] = Object.keys(UserAction).map((key) => ({
-  code: UserAction[key],
+  roleCode: UserAction[key],
   name: UserSummary[key],
 }));

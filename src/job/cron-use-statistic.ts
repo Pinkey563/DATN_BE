@@ -15,7 +15,7 @@ export class CronUseStatistic {
 
       await Promise.all(
         users.map(async (user) => {
-          return UserHelper.handleUserStatistic(user.id);
+          return UserHelper.handleUserStatistic(user.userId);
         }),
       );
       console.log('🚀  ~ CronUserStatistic success');

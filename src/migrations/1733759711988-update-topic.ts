@@ -5,8 +5,8 @@ import { MigrationInterface, QueryRunner, TableColumn } from 'typeorm';
 export class UpdateTopic1733759711988 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumns(EntityNameConst.TOPIC, [
-      new TableColumn(MigrationConst.intColumn('classroom_id', { isNullable: true })),
-      new TableColumn(MigrationConst.intColumn('creator_id', { isNullable: true })),
+      new TableColumn(MigrationConst.bigIntColumn('classroom_id', { isNullable: true })),
+      new TableColumn(MigrationConst.bigIntColumn('creator_id', { isNullable: true })),
       new TableColumn(MigrationConst.varcharColumn('description', { isNullable: true })),
       new TableColumn(MigrationConst.varcharColumn('image_location', { isNullable: true })),
       new TableColumn(MigrationConst.booleanColumn('is_common', { default: false })),

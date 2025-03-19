@@ -9,7 +9,7 @@ export class CreateUploadTables1718354946545 implements MigrationInterface {
       MigrationConst.createdAtColumn,
       MigrationConst.varcharColumn('path', { isPrimary: true }),
       MigrationConst.booleanColumn('is_active', { default: false }),
-      MigrationConst.intColumn('creator_id'),
+      MigrationConst.bigIntColumn('creator_id'),
     ],
   });
 
@@ -17,10 +17,10 @@ export class CreateUploadTables1718354946545 implements MigrationInterface {
     name: EntityNameConst.UPLOAD_CLEAN_HISTORY,
     columns: [
       MigrationConst.idPrimaryColumn,
-      MigrationConst.timestamptzColumn('start_at'),
-      MigrationConst.timestamptzColumn('end_at'),
-      MigrationConst.intColumn('total_success'),
-      MigrationConst.intColumn('total_error'),
+      MigrationConst.timestampColumn('start_at'),
+      MigrationConst.timestampColumn('end_at'),
+      MigrationConst.bigIntColumn('total_success'),
+      MigrationConst.bigIntColumn('total_error'),
     ],
   });
 

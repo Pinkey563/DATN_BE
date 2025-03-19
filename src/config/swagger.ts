@@ -15,7 +15,7 @@ export const initAPIDocs = ({ app, endpoint }: { app; endpoint: string }): void 
       'api-key', // Name of the security scheme
     )
     .setTitle(title)
-    .setVersion('1.0')
+    .setVersion('3.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

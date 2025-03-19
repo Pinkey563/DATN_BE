@@ -26,8 +26,8 @@ export class CreateRolePermissionTable1715673939033 implements MigrationInterfac
   private rolePermissionTable = new Table({
     name: EntityNameConst.ROLE_PERMISSION,
     columns: [
-      MigrationConst.intColumn('role_id', { isPrimary: true }),
-      MigrationConst.intColumn('permission_id', { isPrimary: true }),
+      MigrationConst.bigIntColumn('role_id', { isPrimary: true }),
+      MigrationConst.bigIntColumn('permission_id', { isPrimary: true }),
       MigrationConst.booleanColumn('is_active', { default: true }),
     ],
   });
