@@ -112,7 +112,7 @@ function dbTypeToSwagger(type: ColumnType): any {
     case 'varchar':
     case 'char':
     case 'text':
-    case 'decimal':
+    case 'numeric':
       return 'string';
     case 'int':
     case 'smallint':

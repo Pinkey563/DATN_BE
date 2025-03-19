@@ -5,10 +5,10 @@ import { Role } from './role.entity';
 
 @Entity(EntityNameConst.ROLE_PERMISSION)
 export class RolePermission extends BaseEntity {
-  @Column({ type: 'varchar', name: 'code', primary: true })
-  code: string;
+  @Column({ type: 'int', name: 'role_id', primary: true })
+  roleId: number;
 
-  @Column({ type: 'bigint', name: 'permission_id', primary: true })
+  @Column({ type: 'int', name: 'permission_id', primary: true })
   permissionId: number;
 
   @Column({ type: 'boolean', name: 'is_active', default: true })
@@ -21,6 +21,6 @@ export class RolePermission extends BaseEntity {
   permission: Permission;
 
   @ManyToOne(() => Role, (role: Role) => role.rolePermissions, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'code' })
+  @JoinColumn({ name: 'role_id' })
   role: Role;
 }

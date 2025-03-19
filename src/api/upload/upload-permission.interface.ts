@@ -15,6 +15,6 @@ export const UploadSummary: Record<keyof typeof UploadAction, string> = {
 };
 
 export const UploadPermission: Partial<Permission>[] = Object.keys(UploadAction).map((key) => ({
-  roleCode: UploadAction[key],
+  code: UploadAction[key],
   name: UploadSummary[key],
 }));

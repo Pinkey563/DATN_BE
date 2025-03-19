@@ -6,7 +6,7 @@ type ForeignKeyOption = Omit<TableForeignKeyOptions, 'columnNames' | 'referenced
 export const MigrationConst = Object.freeze({
   idPrimaryColumn: {
     name: 'id',
-    type: 'bigint',
+    type: 'integer',
     isPrimary: true,
     isGenerated: true, // Auto-increment
     generationStrategy: 'increment',
@@ -14,19 +14,19 @@ export const MigrationConst = Object.freeze({
 
   createdAtColumn: {
     name: 'created_at',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: 'now()',
   } as TableColumnOptions,
 
   updatedAtColumn: {
     name: 'updated_at',
-    type: 'timestamp',
+    type: 'timestamptz',
     default: 'now()',
   } as TableColumnOptions,
 
   deletedAtColumn: {
     name: 'deleted_at',
-    type: 'timestamp',
+    type: 'timestamptz',
     isNullable: true,
   } as TableColumnOptions,
 
@@ -66,17 +66,17 @@ export const MigrationConst = Object.freeze({
       ...option,
     }) as TableColumnOptions,
 
-  decimal: (name, option?: ColumnOption) =>
+  numeric: (name, option?: ColumnOption) =>
     ({
       name,
-      type: 'decimal',
+      type: 'numeric',
       ...option,
     }) as TableColumnOptions,
 
-  bigIntColumn: (name, option?: ColumnOption) =>
+  intColumn: (name, option?: ColumnOption) =>
     ({
       name,
-      type: 'bigint',
+      type: 'int',
       ...option,
     }) as TableColumnOptions,
 
@@ -102,17 +102,17 @@ export const MigrationConst = Object.freeze({
       ...option,
     }) as TableColumnOptions,
 
-  timestampColumn: (name, option?: ColumnOption) =>
+  timestamptzColumn: (name, option?: ColumnOption) =>
     ({
       name,
-      type: 'timestamp',
+      type: 'timestamptz',
       ...option,
     }) as TableColumnOptions,
 
-  jsonColumn: (name, option?: ColumnOption) =>
+  jsonbColumn: (name, option?: ColumnOption) =>
     ({
       name,
-      type: 'json',
+      type: 'jsonb',
       ...option,
     }) as TableColumnOptions,
 });

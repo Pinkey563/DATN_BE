@@ -1,37 +1,33 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractCreatedIdEntity } from '../entity.interface';
 import { User } from '../user/user.entity';
 import { Vocabulary } from './vocabulary.entity';
-import { IsSwaggerNumber } from '../../decorator/swagger.decorator';
+
 @Entity(EntityNameConst.VOCABULARY_VIEW)
 export class VocabularyView extends AbstractCreatedIdEntity {
-  @IsSwaggerNumber({ default: 1 })
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'vocabulary_view_id' }) // Định nghĩa ID mới
-  vocabularyViewId: number;
-
   @DBColumn({
     name: 'user_id',
-    type: 'bigint',
+    type: 'int',
   })
   userId: number;
 
   @DBColumn({
     name: 'vocabulary_id',
-    type: 'bigint',
+    type: 'int',
   })
   vocabularyId: number;
 
   @DBColumn({
     name: 'last_viewed_at',
-    type: 'timestamp',
+    type: 'timestamptz',
   })
-  lastViewedAt: Date;
+  lastViewedAt: string;
 
   @DBColumn({
     name: 'view_count',
-    type: 'bigint',
+    type: 'int',
     default: 0,
   })
   viewCount: number;

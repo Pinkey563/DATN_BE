@@ -1,6 +1,6 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ClassRoom } from '../class/classroom.entity';
 import { AbstractTimeEntity } from '../entity.interface';
 import { User } from '../user/user.entity';
@@ -8,19 +8,16 @@ import { Vocabulary } from './vocabulary.entity';
 
 @Entity(EntityNameConst.TOPIC)
 export class Topic extends AbstractTimeEntity {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'topic_id' }) // Định nghĩa ID mới
-  topicId: number;
-
   @DBColumn({
-    name: 'content',
+    name: 'name',
     type: 'varchar',
     unique: true,
   })
   name: string;
 
   @DBColumn({
-    name: 'class_room_id',
-    type: 'bigint',
+    name: 'classroom_id',
+    type: 'int',
     nullable: true,
   })
   classroomId?: number;
@@ -40,27 +37,16 @@ export class Topic extends AbstractTimeEntity {
   description: string;
 
   @DBColumn({
-    name: 'created_by',
-    type: 'varchar',
+    name: 'creator_id',
+    type: 'int',
     nullable: true,
   })
-  creatorEmail: string;
+  creatorId?: number;
 
   @DBColumn({
-    name: 'created_id',
-    type: 'varchar',
-    nullable: true,
-  })
-  creatorId: number;
-
-  @DBColumn({
-    name: 'is_private',
-    type: 'bit',
-    // default: 0,
-    transformer: {
-      to: (value: boolean) => value ? Buffer.from([1]) : Buffer.from([0]), // Lưu vào DB
-      from: (value: Buffer) => value[0] === 1, // Lấy từ DB
-    },
+    name: 'is_common',
+    type: 'boolean',
+    default: false,
   })
   isCommon: boolean;
 
@@ -70,10 +56,10 @@ export class Topic extends AbstractTimeEntity {
   vocabulary: Vocabulary;
 
   @ManyToOne(() => ClassRoom, (classRoom) => classRoom.topics, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'class_room_id' })
+  @JoinColumn({ name: 'classroom_id' })
   classroom?: ClassRoom;
 
   @ManyToOne(() => User, (user) => user.topics, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'created_by' })
+  @JoinColumn({ name: 'creator_id' })
   creator?: User;
 }

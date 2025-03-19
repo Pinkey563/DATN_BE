@@ -3,7 +3,7 @@ import { DBColumn } from 'src/decorator/swagger.decorator';
 import { AppStatus } from 'src/types/common';
 import { VocabularyTypeConst } from 'src/types/vocabulary';
 import { StringUtil } from 'src/utils/string';
-import { BeforeInsert, PrimaryGeneratedColumn, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ClassRoom } from '../class/classroom.entity';
 import { AbstractTimeEntity } from '../entity.interface';
 import { User } from '../user/user.entity';
@@ -12,9 +12,6 @@ import { VocabularyView } from './vocabulary-view.entity';
 
 @Entity(EntityNameConst.VOCABULARY)
 export class Vocabulary extends AbstractTimeEntity {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'vocabulary_id' }) // Định nghĩa ID mới
-  vocabularyId: number;
-
   @DBColumn({
     name: 'content',
     type: 'varchar',
@@ -28,28 +25,16 @@ export class Vocabulary extends AbstractTimeEntity {
   })
   description: string;
 
-  // @DBColumn({
-  //   name: 'is_private',
-  //   type: 'bit',
-  //   default: 0,
-  // })
-  // isPrivate: Buffer;
   @DBColumn({
     name: 'is_private',
-    type: 'bit',
-  //   default: 0,
-  // })
-  // private: Buffer;
-  transformer: {
-    to: (value: boolean) => value ? Buffer.from([1]) : Buffer.from([0]), // Lưu vào DB
-    from: (value: Buffer) => value[0] === 1, // Lấy từ DB
-  },
-})
+    type: 'boolean',
+    default: false,
+  })
   isPrivate: boolean;
 
   @DBColumn({
     name: 'topic_id',
-    type: 'bigint',
+    type: 'int',
   })
   topicId: number;
 
@@ -62,30 +47,17 @@ export class Vocabulary extends AbstractTimeEntity {
   vocabularyType: VocabularyTypeConst;
 
   @DBColumn({
-    name: 'class_room_id',
-    type: 'bigint',
+    name: 'classroom_id',
+    type: 'int',
     nullable: true,
   })
   classroomId: number;
 
   @DBColumn({
-    name: 'part_id',
-    type: 'bigint',
-    nullable: true,
-  })
-  partId: number;
-
-  @DBColumn({
-    name: 'created_id',
-    type: 'bigint',
+    name: 'creator_id',
+    type: 'int',
   })
   creatorId: number;
-
-  @DBColumn({
-    name: 'created_by',
-    type: 'varchar',
-  })
-  creatorEmail: string;
 
   @DBColumn({
     name: 'images_path',
@@ -96,26 +68,12 @@ export class Vocabulary extends AbstractTimeEntity {
   imagesPath: string[];
 
   @DBColumn({
-    name: 'note',
-    type: 'varchar',
-    nullable: true,
-  })
-  note: string;
-
-  @DBColumn({
     name: 'videos_path',
     type: 'varchar',
     nullable: true,
     array: true,
   })
   videosPath: string;
-
-  @DBColumn({
-    name: 'lesson_id',
-    type: 'bigint',
-    nullable: true,
-  })
-  lessonId: number;
 
   @DBColumn({ name: 'slug', type: 'varchar', nullable: true })
   slug: string;
@@ -133,11 +91,11 @@ export class Vocabulary extends AbstractTimeEntity {
   vocabularyViews: VocabularyView[];
 
   @ManyToOne(() => User, (user) => user.vocabularies, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'created_by' })
+  @JoinColumn({ name: 'creator_id' })
   creator: User;
 
   @ManyToOne(() => ClassRoom, (classRoom) => classRoom.vocabularies, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'class_room_id' })
+  @JoinColumn({ name: 'classroom_id' })
   classroom: ClassRoom;
 
   @BeforeInsert()

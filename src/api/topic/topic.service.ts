@@ -22,7 +22,7 @@ export class TopicService {
   search = async (query: SearchTopicDto): Promise<PageDto<Topic>> => {
     const [data, itemCount] = await Topic.findAndCount({
       select: {
-        topicId: true,
+        id: true,
         name: true,
         classroomId: true,
         imageLocation: true,
@@ -31,7 +31,7 @@ export class TopicService {
         creatorId: true,
         isCommon: true,
         classroom: {
-          classroomId: true,
+          id: true,
           name: true,
           classLevel: true,
         },
@@ -63,25 +63,25 @@ export class TopicService {
     return await topic.save();
   }
 
-  getById = async (topicId: number): Promise<Topic> => {
+  getById = async (id: number): Promise<Topic> => {
     const classRoom = await Topic.findOne({
       select: {
         classroom: {
-          classroomId: true,
+          id: true,
           name: true,
           classLevel: true,
         },
       },
-      where: { topicId },
+      where: { id },
       relations: { classroom: true },
     });
-    if (!classRoom) throw new App404Exception('id', { topicId });
+    if (!classRoom) throw new App404Exception('id', { id });
     return classRoom;
   };
 
-  updateById = async (topicId: number, user: CacheUser, body: UpdateTopicDto, permissionCode: string): Promise<Topic> => {
-    const topic = await Topic.findOne({ where: { topicId } });
-    if (!topic) throw new App404Exception('id', { topicId });
+  updateById = async (id: number, user: CacheUser, body: UpdateTopicDto, permissionCode: string): Promise<Topic> => {
+    const topic = await Topic.findOne({ where: { id } });
+    if (!topic) throw new App404Exception('id', { id });
 
     if (body.name != topic.name) {
       const isExistByName = await HelperUtils.existByName(Topic, body.name, 'name');
@@ -95,16 +95,16 @@ export class TopicService {
     return await topic.save();
   };
 
-  deleteById = async (topicId: number, user: CacheUser, permissionCode): Promise<any> => {
+  deleteById = async (id: number, user: CacheUser, permissionCode): Promise<any> => {
     let topic;
     const userRole = await RoleHelper.getRoleByUserId(user.userId);
-    if (userRole.roleCode === 'ADMIN') {
-      topic = await Topic.findOne({ where: { topicId } });
+    if (userRole.code === 'ADMIN') {
+      topic = await Topic.findOne({ where: { id } });
     } else {
-      topic = await Topic.findOne({ where: { topicId, creatorId: user.userId } });
+      topic = await Topic.findOne({ where: { id, creatorId: user.userId } });
     }
 
-    if (!topic) throw new App404Exception('id', { topicId });
+    if (!topic) throw new App404Exception('id', { id });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });

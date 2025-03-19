@@ -1,14 +1,11 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractCreatedIdEntity } from '../entity.interface';
 import { Question } from './question.entity';
 
 @Entity(EntityNameConst.ANSWER)
 export class Answer extends AbstractCreatedIdEntity {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'answer_id' }) // Định nghĩa ID mới
-  answerId: number;
-
   @DBColumn({
     name: 'content',
     type: 'varchar',
@@ -16,11 +13,11 @@ export class Answer extends AbstractCreatedIdEntity {
   content: string;
 
   @DBColumn({
-    name: 'is_correct',
-    type: 'bit',
-    default: 0,
+    name: 'correct',
+    type: 'boolean',
+    default: false,
   })
-  correct: Buffer;
+  correct: boolean;
 
   @DBColumn({
     name: 'image_location',
@@ -38,7 +35,7 @@ export class Answer extends AbstractCreatedIdEntity {
 
   @DBColumn({
     name: 'question_id',
-    type: 'bigint',
+    type: 'int',
   })
   questionId: number;
 

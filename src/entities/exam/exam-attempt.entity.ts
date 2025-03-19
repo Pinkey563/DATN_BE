@@ -1,6 +1,6 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { AbstractCreatedIdEntity } from '../entity.interface';
 import { StudentAnswer } from '../question/student-answer.entity';
 import { User } from '../user/user.entity';
@@ -8,23 +8,21 @@ import { EXAM } from './exam.entity';
 
 @Entity(EntityNameConst.EXAM_ATTEMPT)
 export class ExamAttempt extends AbstractCreatedIdEntity {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'user_exam_id' }) // Định nghĩa ID mới
-    userExamId: number;
   @DBColumn({
-    name: 'user_id',
-    type: 'bigint',
+    name: 'student_id',
+    type: 'int',
   })
   studentId: number;
 
   @DBColumn({
     name: 'exam_id',
-    type: 'bigint',
+    type: 'int',
   })
   examId: number;
 
   @DBColumn({
     name: 'score',
-    type: 'decimal',
+    type: 'numeric',
     nullable: true,
     precision: 10,
     scale: 2,
@@ -32,7 +30,7 @@ export class ExamAttempt extends AbstractCreatedIdEntity {
   score: number;
 
   @DBColumn({
-    name: 'is_finish',
+    name: 'is_finished',
     type: 'boolean',
     default: false,
   })
@@ -41,7 +39,7 @@ export class ExamAttempt extends AbstractCreatedIdEntity {
   // RELATIONSHIP
 
   @ManyToOne(() => User, (User) => User.examAttempts, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'student_id' })
   student: User;
 
   @ManyToOne(() => EXAM, (exam) => exam.examAttempts, { onDelete: 'CASCADE' })

@@ -9,11 +9,11 @@ export class CreateTableStatistic1735129158532 implements MigrationInterface {
       MigrationConst.idPrimaryColumn,
       MigrationConst.createdAtColumn,
       MigrationConst.updatedAtColumn,
-      MigrationConst.bigIntColumn('user_id'),
-      MigrationConst.bigIntColumn('total_classes_joined', { default: 0 }),
-      MigrationConst.bigIntColumn('vocabulary_views', { default: 0 }),
-      MigrationConst.decimal('average_score', { precision: 10, scale: 2, default: 0.0 }),
-      MigrationConst.bigIntColumn('tests_completed', { default: 0 }),
+      MigrationConst.intColumn('user_id'),
+      MigrationConst.intColumn('total_classes_joined', { default: 0 }),
+      MigrationConst.intColumn('vocabulary_views', { default: 0 }),
+      MigrationConst.numeric('average_score', { precision: 10, scale: 2, default: 0.0 }),
+      MigrationConst.intColumn('tests_completed', { default: 0 }),
     ],
   });
 

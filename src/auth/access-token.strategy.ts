@@ -25,7 +25,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     if (!cacheUser) {
       const user = await User.findOne({
-        where: { userId: payload.sub },
+        where: { id: payload.sub },
         relations: {
           role: {
             rolePermissions: {
@@ -42,10 +42,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       const actions = await ExtractUtil.roleActions(user.role);
 
       cacheUser = {
-        userId: user.userId,
+        userId: user.id,
         username: user.username,
-        // code: user.code,
-        code: user.code,
+        roleId: user.roleId,
+        roleCode: user.role.code,
         isSupperAdmin: user.isSupperAdmin,
         actions,
       };

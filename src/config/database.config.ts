@@ -11,10 +11,8 @@ const config: DataSourceOptions = {
   username: ENV.DATABASE.DB_USERNAME,
   password: ENV.DATABASE.DB_PASSWORD,
   database: ENV.DATABASE.DB_NAME,
-  // entities: [join(__dirname, '/../**/**.entity{.ts,.js}')],
-  // migrations: ['dist/migrations/*{.ts,.js}'],
-  entities: [join(__dirname, '/../entities/**/*.entity{.ts,.js}')],
-  migrations: [join(__dirname, '/../migrations/*{.ts,.js}')],
+  entities: [join(__dirname, '/../**/**.entity{.ts,.js}')],
+  migrations: ['dist/migrations/*{.ts,.js}'],
   synchronize: false,
 };
 

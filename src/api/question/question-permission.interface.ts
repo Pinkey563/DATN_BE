@@ -17,6 +17,6 @@ export const QuestionSummary: Record<keyof typeof QuestionAction, string> = {
 };
 
 export const QuestionPermission: Partial<Permission>[] = Object.keys(QuestionAction).map((key) => ({
-  roleCode: QuestionAction[key],
+  code: QuestionAction[key],
   name: QuestionSummary[key],
 }));

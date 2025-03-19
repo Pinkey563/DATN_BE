@@ -9,14 +9,14 @@ import { FindOptionsSelect, ILike } from 'typeorm';
 
 export class UserHelper {
   static selectBasicInfo: FindOptionsSelect<User> = {
-    userId: true,
+    id: true,
     username: true,
     name: true,
     email: true,
     phoneNumber: true,
     avatarLocation: true,
     gender: true,
-    role: { roleCode: true },
+    role: { code: true },
     slug: true,
   };
 
@@ -24,7 +24,7 @@ export class UserHelper {
     let userWhere: ConditionWhere<User> = {};
     userWhere = {
       ...(q.name && { name: ILike(`%${q.name}%`) }),
-      role: { roleCode: q.roleCode },
+      role: { code: q.roleCode },
       ...(q.status && { status: q.status }),
     };
 
@@ -35,7 +35,7 @@ export class UserHelper {
     let userWhere: ConditionWhere<ClassStudent> = {};
     userWhere = {
       ...(q.name && { name: ILike(`%${q.name}%`) }),
-      classroom: { classroomId: q.classRoomId },
+      classroom: { id: q.classRoomId },
     };
 
     return { ...userWhere };

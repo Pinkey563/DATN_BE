@@ -58,13 +58,13 @@ export class UserService {
         city: true,
         ward: true,
       },
-      where: { userId: userId, role: { roleCode: Not(RoleCode.ADMIN) }, ...whereCustom },
+      where: { id: userId, role: { code: Not(RoleCode.ADMIN) }, ...whereCustom },
       relations: { role: true },
     });
     if (!user) throw new App404Exception('userId', { userId });
     const userReturn = {
       ...user,
-      role: user.role.roleCode,
+      role: user.role.code,
     };
     return userReturn;
   }
@@ -76,14 +76,14 @@ export class UserService {
   login = async (body: LoginDto) => {
     const user = await User.findOne({
       where: { email: body.email },
-      select: ['userId', 'email', 'password'],
+      select: ['id', 'email', 'password'],
     });
 
     if (!user) throw new App404Exception('email', body);
     const isPasswordMatch = body.password === HashUtil.aesDecrypt(user.password);
     if (!isPasswordMatch) throw new AppException(ERROR_MSG.PASSWORD_NOT_CORRECT);
 
-    const data = await HashUtil.signAccessToken(user.userId, user.email, this.jwtService);
+    const data = await HashUtil.signAccessToken(user.id, user.email, this.jwtService);
 
     const cacheKeyAuth = GenerateUtil.keyAuth(data.payload);
 
@@ -97,7 +97,7 @@ export class UserService {
     if (isExistByName) throw new AppExistedException('email', body);
 
     const role = await RoleHelper.getRoleByCode(body.role);
-    if (!role || role.roleCode === RoleCode.ADMIN) throw new App404Exception('role', body);
+    if (!role || role.code === RoleCode.ADMIN) throw new App404Exception('role', body);
 
     const otp = Math.floor(100000 + Math.random() * 900000);
     const expiry = DateUtil.getTimeFuture(new Date(), 0, 2, 0); // Thời gian hết hạn dayjs().add(10, 'minute').toISOString();
@@ -131,7 +131,7 @@ export class UserService {
     // Lưu vào cơ sở dữ liệu (ví dụ dùng TypeORM)
 
     const user = new User();
-    if (body.role.roleCode == RoleCode.TEACHER) {
+    if (body.role.code == RoleCode.TEACHER) {
       user.status = AppStatus.PENDING;
     }
     user.username = body.username;
@@ -140,15 +140,15 @@ export class UserService {
     user.email = body.email;
     user.phoneNumber = body.phoneNumber;
 
-    // user.code = body.role.id;
+    user.roleId = body.role.id;
 
     await user.save();
 
-    if (body.role.roleCode === RoleCode.STUDENT) {
-      const studentCode = UserHelper.generateStudentCode(user.userId);
+    if (body.role.code === RoleCode.STUDENT) {
+      const studentCode = UserHelper.generateStudentCode(user.id);
       const studentProfile = new StudentProfile();
       studentProfile.studentCode = studentCode;
-      studentProfile.userId = user.userId;
+      studentProfile.userId = user.id;
       await studentProfile.save();
     }
     // Xóa Redis sau khi xác minh thành công
@@ -158,7 +158,7 @@ export class UserService {
   }
 
   updateProfile = async ({ userId }: CacheUser, body: UpdateUserProfileDto, permissionCode: string): Promise<any> => {
-    const user = await User.findOneBy({ userId: userId });
+    const user = await User.findOneBy({ id: userId });
     if (!user) throw new App404Exception('userId', { userId });
 
     const oldUser = JSON.stringify(user);
@@ -179,7 +179,7 @@ export class UserService {
     }
 
     if (CondUtil.diffAndVail(body.birthday, user.birthday)) {
-      user.birthday = new Date(body.birthday);
+      user.birthday = body.birthday;
     }
 
     if (CondUtil.diffAndVail(body.gender, user.gender)) {
@@ -200,11 +200,11 @@ export class UserService {
     if (!diff.length) throw new AppException(ERROR_MSG.HAVE_NOT_ANY_CHANGE);
 
     return await this.dataSource.transaction(async (txEntityManager) => {
-      await txEntityManager.update(User, { id: user.userId }, user);
+      await txEntityManager.update(User, { id: user.id }, user);
       const userLog = new UserLog();
       userLog.metadata = JSON.stringify(diff);
-      userLog.userId = user.userId;
-      userLog.permissionId = permission.permissionId;
+      userLog.userId = user.id;
+      userLog.permissionId = permission.id;
       await txEntityManager.save(userLog);
 
       const listPaths = ArrUtil.getPathsFromBody({ body, uploadKeys });
@@ -223,16 +223,16 @@ export class UserService {
         isSupperAdmin: true,
         status: true,
         createdAt: true,
-        role: { roleCode: true },
+        role: { code: true },
         schoolName: true,
         address: true,
         studentProfile: {
           studentCode: true,
         },
         classStudents: {
-          classStudentId: true,
+          id: true,
           classroom: {
-            classroomId: true,
+            id: true,
             name: true,
           },
         },
@@ -256,8 +256,8 @@ export class UserService {
   };
 
   approveUser = async (userId: number, id, permissionCode) => {
-    const user = await User.findOneBy({ userId });
-    if (!user) throw new App404Exception('userId', { userId: userId });
+    const user = await User.findOneBy({ id });
+    if (!user) throw new App404Exception('userId', { userId: id });
     const isPermission = await PermissionHelper.isPermissionChange(userId, permissionCode);
     if (!isPermission) throw new AppException(ERROR_MSG.PERMISSION_DENIED);
     user.status = AppStatus.APPROVED;
@@ -267,7 +267,7 @@ export class UserService {
   };
 
   changePassword = async ({ userId }: CacheUser, body: ChangeUserPasswordDto) => {
-    const user = await User.findOneBy({ userId: userId });
+    const user = await User.findOneBy({ id: userId });
     if (!user) throw new App404Exception('userId', { userId });
 
     const isMatch = await HashUtil.comparePassword(body.oldPassword, user.password);
@@ -279,32 +279,32 @@ export class UserService {
     return true;
   };
 
-  viewVocabulary = async (userId: number, vocabularyId: number) => {
-    const vocabulary = await Vocabulary.findOne({ where: { vocabularyId } });
-    if (!vocabulary) throw new App404Exception('id', { vocabularyId });
+  viewVocabulary = async (userId: number, id: number) => {
+    const vocabulary = await Vocabulary.findOne({ where: { id } });
+    if (!vocabulary) throw new App404Exception('id', { id });
 
     let vocabularyView = await VocabularyView.findOne({
       where: {
-        vocabularyId: vocabularyId,
+        vocabularyId: id,
         userId,
       },
     });
 
     if (!vocabularyView) {
       vocabularyView = new VocabularyView();
-      vocabularyView.vocabularyId = vocabulary.vocabularyId;
+      vocabularyView.vocabularyId = vocabulary.id;
       vocabularyView.userId = userId;
       vocabularyView.viewCount = 0;
     }
 
-    vocabularyView.lastViewedAt = new Date();
+    vocabularyView.lastViewedAt = new Date().toISOString();
     vocabularyView.viewCount = vocabularyView.viewCount + 1;
     await vocabularyView.save();
   };
 
   // Thống kê
   getStatisticsById = async (userId) => {
-    const user = await User.findOneBy({ userId: userId });
+    const user = await User.findOneBy({ id: userId });
     if (!user) throw new App404Exception('userId', { userId });
 
     const userStatistic = await UserStatistic.findOneBy({ userId });
@@ -340,12 +340,12 @@ export class UserService {
     //   .getRawMany();
       const classJoinedCount = await ClassStudent.createQueryBuilder('classStudent')
         .innerJoinAndSelect('classStudent.classroom', 'classRoom') // Join để lấy thông tin lớp học
-        .select('classRoom.classroomId', 'classRoomId')
+        .select('classRoom.id', 'classRoomId')
         .addSelect('classRoom.name', 'name')
         .addSelect('classRoom.thumbnailPath', 'thumbnailPath')
         .addSelect('classRoom.classCode', 'classCode')
         .where('classStudent.studentId = :userId', { userId: user.userId }) // Chỉ lấy lớp học của học sinh
-        .groupBy('classRoom.classroomId')
+        .groupBy('classRoom.id')
         .addGroupBy('classRoom.name')
         .addGroupBy('classRoom.thumbnailPath')
         .addGroupBy('classRoom.classCode')
@@ -358,14 +358,14 @@ export class UserService {
     const [data, itemCount] = await ClassStudent.findAndCount({
       select: {
         classroom: {
-          classroomId: true,
+          id: true,
           name: true,
           thumbnailPath: true,
           classCode: true,
           slug: true,
         },
         student: {
-          userId: true,
+          id: true,
           name: true,
         },
       },

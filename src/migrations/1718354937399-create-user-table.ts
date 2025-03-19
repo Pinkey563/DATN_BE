@@ -17,7 +17,7 @@ export class CreateUserTable1718354937399 implements MigrationInterface {
       MigrationConst.varcharColumn('cover_photo', { isNullable: true }),
       MigrationConst.varcharColumn('facebook_url', { isNullable: true }),
       MigrationConst.booleanColumn('is_super_admin', { default: false }),
-      MigrationConst.bigIntColumn('role_id', { isNullable: true }),
+      MigrationConst.intColumn('role_id', { isNullable: true }),
       MigrationConst.varcharColumn('slug', { isNullable: true }),
       MigrationConst.enumColumn('status', AppStatus, { default: `'${AppStatus.APPROVED}'` }),
       MigrationConst.varcharColumn('email', { isNullable: true, isUnique: true }),

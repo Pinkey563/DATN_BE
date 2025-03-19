@@ -27,7 +27,7 @@ export class ClassroomService {
   search = async (query: SearchClassroomDto): Promise<PageDto<ClassRoom>> => {
     const [data, itemCount] = await ClassRoom.findAndCount({
       select: {
-        classroomId: true,
+        id: true,
         name: true,
         createdAt: true,
         description: true,
@@ -38,7 +38,7 @@ export class ClassroomService {
         classCode: true,
         slug: true,
         teacher: {
-          userId: true,
+          id: true,
           name: true,
         },
       },
@@ -58,10 +58,10 @@ export class ClassroomService {
 
     const [data, itemCount] = await ClassStudent.findAndCount({
       select: {
-        classStudentId: true,
+        id: true,
         studentId: true,
         student: {
-          userId: true,
+          id: true,
           username: true,
           email: true,
         },
@@ -81,7 +81,7 @@ export class ClassroomService {
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
 
     if (body.teacherId) {
-      const teacher = await User.findOneBy({ userId: body.teacherId, role: { roleCode: 'TEACHER' } });
+      const teacher = await User.findOneBy({ id: body.teacherId, role: { code: 'TEACHER' } });
       if (!teacher) throw new App404Exception('teacherId', { teacherId: body.teacherId });
     }
 
@@ -97,7 +97,7 @@ export class ClassroomService {
     classroom.isTeacherCreated = true;
     classroom.classLevel = body.classLevel;
 
-    if (userRole.roleCode === 'ADMIN') {
+    if (userRole.code === 'ADMIN') {
       classroom.isTeacherCreated = false;
       classroom.status = AppStatus.APPROVED;
     }
@@ -106,34 +106,34 @@ export class ClassroomService {
     return classroom;
   }
 
-  getById = async (classroomId: number): Promise<ClassRoom> => {
+  getById = async (id: number): Promise<ClassRoom> => {
     const classRoom = await ClassRoom.findOne({
       select: {
         teacher: {
-          userId: true,
+          id: true,
           username: true,
         },
       },
-      where: { classroomId },
+      where: { id },
       relations: { teacher: true },
     });
-    if (!classRoom) throw new App404Exception('id', { classroomId });
+    if (!classRoom) throw new App404Exception('id', { id });
     return classRoom;
   };
 
   updateById = async (
-    classroomId: number,
+    id: number,
     user: CacheUser,
     body: UpdateClassroomDto,
     permissionCode: string,
   ): Promise<ClassRoom> => {
     let classroom;
-    if (user.code === 'ADMIN') {
-      classroom = await ClassRoom.findOne({ where: { classroomId } });
+    if (user.roleCode === 'ADMIN') {
+      classroom = await ClassRoom.findOne({ where: { id } });
     } else {
-      classroom = await ClassRoom.findOne({ where: { classroomId, teacherId: user.userId } });
+      classroom = await ClassRoom.findOne({ where: { id, teacherId: user.userId } });
     }
-    if (!classroom) throw new App404Exception('id', { classroomId });
+    if (!classroom) throw new App404Exception('id', { id });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
@@ -150,17 +150,17 @@ export class ClassroomService {
     return classroom;
   };
 
-  deleteById = async (classroomId: number, user: CacheUser, permissionCode): Promise<ClassRoom> => {
+  deleteById = async (id: number, user: CacheUser, permissionCode): Promise<ClassRoom> => {
     const userRole = await RoleHelper.getRoleByUserId(user.userId);
-    if (userRole.roleCode === 'ADMIN') {
-      const classroom = await ClassRoom.findOne({ where: { classroomId } });
-      if (!classroom) throw new App404Exception('id', { classroomId });
+    if (userRole.code === 'ADMIN') {
+      const classroom = await ClassRoom.findOne({ where: { id } });
+      if (!classroom) throw new App404Exception('id', { id });
       await classroom.remove();
       return classroom;
     }
 
-    const classroom = await ClassRoom.findOne({ where: { classroomId, teacherId: user.userId } });
-    if (!classroom) throw new App404Exception('id', { classroomId });
+    const classroom = await ClassRoom.findOne({ where: { id, teacherId: user.userId } });
+    if (!classroom) throw new App404Exception('id', { id });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
@@ -169,9 +169,9 @@ export class ClassroomService {
     return classroom;
   };
 
-  joinClass = async (classroomId: number, user: CacheUser, body, permissionCode): Promise<any> => {
-    const classroom = await ClassRoom.findOne({ where: { classroomId, status: AppStatus.APPROVED } });
-    if (!classroom) throw new App404Exception('id', { classroomId });
+  joinClass = async (id: number, user: CacheUser, body, permissionCode): Promise<any> => {
+    const classroom = await ClassRoom.findOne({ where: { id, status: AppStatus.APPROVED } });
+    if (!classroom) throw new App404Exception('id', { id });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
@@ -180,46 +180,46 @@ export class ClassroomService {
     if (!student) throw new App404Exception('userId', { userId: body.studentCode });
 
     const classStudentExist = await ClassStudent.findOne({
-      where: { studentId: student.userId },
+      where: { studentId: student.id },
     });
     if (classStudentExist) throw new AppExistedException('studentId', { studentId: body.studentCode });
 
     const classStudent = new ClassStudent();
 
-    classStudent.classroomId = classroom.classroomId;
-    classStudent.studentId = student.userId;
+    classStudent.classroomId = classroom.id;
+    classStudent.studentId = student.id;
 
     await classStudent.save();
     return true;
   };
 
-  leaveClass = async (classroomId: number, user: CacheUser, body, permissionCode): Promise<any> => {
-    const classroom = await ClassRoom.findOne({ where: { classroomId } });
-    if (!classroom) throw new App404Exception('id', { classroomId });
+  leaveClass = async (id: number, user: CacheUser, body, permissionCode): Promise<any> => {
+    const classroom = await ClassRoom.findOne({ where: { id } });
+    if (!classroom) throw new App404Exception('id', { id });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
 
     const student = await User.findOne({ where: { studentProfile: { studentCode: body.studentCode } } });
-    const classStudent = await ClassStudent.findOne({ where: { classroomId: classroom.classroomId, studentId: student.userId } });
+    const classStudent = await ClassStudent.findOne({ where: { classroomId: classroom.id, studentId: student.id } });
     if (!classStudent) throw new App404Exception('studentId', { studentId: body.studentId });
 
     await classStudent.remove();
     return true;
   };
 
-  updateStudentInClass = async (classroomId: number, user: CacheUser, body, permissionCode): Promise<any> => {
-    const classroom = await ClassRoom.findOne({ where: { classroomId } });
-    if (!classroom) throw new App404Exception('id', { classroomId });
+  updateStudentInClass = async (id: number, user: CacheUser, body, permissionCode): Promise<any> => {
+    const classroom = await ClassRoom.findOne({ where: { id } });
+    if (!classroom) throw new App404Exception('id', { id });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
 
     const student = await User.findOne({ where: { studentProfile: { studentCode: body.studentCode } } });
-    const classStudent = await ClassStudent.findOne({ where: { studentId: student.userId } });
+    const classStudent = await ClassStudent.findOne({ where: { studentId: student.id } });
     if (!classStudent) throw new App404Exception('studentId', { studentId: body.studentCode });
 
-    classStudent.classroomId = classroomId;
+    classStudent.classroomId = id;
 
     return await classStudent.save();
   };

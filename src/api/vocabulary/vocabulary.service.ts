@@ -24,7 +24,7 @@ export class VocabularyService {
   search = async (query: SearchVocabularyDto): Promise<PageDto<Vocabulary>> => {
     const [data, itemCount] = await Vocabulary.findAndCount({
       select: {
-        vocabularyId: true,
+        id: true,
         content: true,
         createdAt: true,
         description: true,
@@ -38,7 +38,7 @@ export class VocabularyService {
         topicId: true,
         slug: true,
         topic: {
-          topicId: true,
+          id: true,
           name: true,
         },
       },
@@ -72,49 +72,49 @@ export class VocabularyService {
     vocabulary.vocabularyType = body.vocabularyType;
     vocabulary.isPrivate = body.isPrivate;
 
-    if (userRole.roleCode === 'ADMIN') {
+    if (userRole.code === 'ADMIN') {
       vocabulary.status = body.status;
     }
 
     return await vocabulary.save();
   }
 
-  getById = async (vocabularyId: number): Promise<Vocabulary> => {
+  getById = async (id: number): Promise<Vocabulary> => {
     const vocabulary = await Vocabulary.findOne({
       select: {
         topic: {
-          topicId: true,
+          id: true,
           name: true,
         },
         classroom: {
-          classroomId: true,
+          id: true,
           name: true,
         },
         creator: {
-          userId: true,
+          id: true,
           name: true,
         },
       },
-      where: { vocabularyId },
+      where: { id },
       relations: { topic: true, classroom: true, creator: true },
     });
-    if (!vocabulary) throw new App404Exception('id', { vocabularyId });
+    if (!vocabulary) throw new App404Exception('id', { id });
     return vocabulary;
   };
 
   updateById = async (
-    vocabularyId: number,
+    id: number,
     user: CacheUser,
     body: UpdateVocabularyDto,
     permissionCode: string,
   ): Promise<Vocabulary> => {
     let vocabulary;
-    if (user.code === 'ADMIN') {
-      vocabulary = await Vocabulary.findOne({ where: { vocabularyId } });
+    if (user.roleCode === 'ADMIN') {
+      vocabulary = await Vocabulary.findOne({ where: { id } });
     } else {
-      vocabulary = await Vocabulary.findOne({ where: { vocabularyId, creatorId: user.userId } });
+      vocabulary = await Vocabulary.findOne({ where: { id, creatorId: user.userId } });
     }
-    if (!vocabulary) throw new App404Exception('id', { vocabularyId });
+    if (!vocabulary) throw new App404Exception('id', { id });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
@@ -141,10 +141,10 @@ export class VocabularyService {
   deleteByIds = async (vocabularyIds: number[], user: CacheUser, permissionCode): Promise<any> => {
     let vocabulary;
     const userRole = await RoleHelper.getRoleByUserId(user.userId);
-    if (userRole.roleCode === 'ADMIN') {
-      vocabulary = await Vocabulary.find({ where: { vocabularyId: In(vocabularyIds) } });
+    if (userRole.code === 'ADMIN') {
+      vocabulary = await Vocabulary.find({ where: { id: In(vocabularyIds) } });
     } else {
-      vocabulary = await Vocabulary.find({ where: { vocabularyId: In(vocabularyIds), creatorId: user.userId } });
+      vocabulary = await Vocabulary.find({ where: { id: In(vocabularyIds), creatorId: user.userId } });
     }
 
     if (!vocabulary.length) throw new App404Exception('id', { id: vocabularyIds });

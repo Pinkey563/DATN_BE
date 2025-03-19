@@ -2,7 +2,7 @@ import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
 import { FileType, QuestionType } from 'src/types/classroom';
 import { StringUtil } from 'src/utils/string';
-import { PrimaryGeneratedColumn, BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { BeforeInsert, BeforeUpdate, Entity, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 import { ClassRoom } from '../class/classroom.entity';
 import { AbstractTimeEntity } from '../entity.interface';
 import { ExamQuestion } from '../exam/exam-question.entity';
@@ -12,9 +12,6 @@ import { StudentAnswer } from './student-answer.entity';
 
 @Entity(EntityNameConst.QUESTION)
 export class Question extends AbstractTimeEntity {
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'question_id' }) // Định nghĩa ID mới
-  questionId: number;
-
   @DBColumn({
     name: 'content',
     type: 'varchar',
@@ -36,22 +33,15 @@ export class Question extends AbstractTimeEntity {
   description: string;
 
   @DBColumn({
-    name: 'class_room_id',
-    type: 'bigint',
+    name: 'classroom_id',
+    type: 'int',
     nullable: true,
   })
   classRoomId: number;
 
   @DBColumn({
-    name: 'created_by',
-    type: 'varchar',
-    nullable: true,
-  })
-  creatorEmail: string;
-
-  @DBColumn({
-    name: 'created_id',
-    type: 'varchar',
+    name: 'creator_id',
+    type: 'int',
     nullable: true,
   })
   creatorId: number;
@@ -92,11 +82,11 @@ export class Question extends AbstractTimeEntity {
   // RELATIONSHIP
 
   @ManyToOne(() => User, (User) => User.questions, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'created_by' })
+  @JoinColumn({ name: 'creator_id' })
   creator: User;
 
   @ManyToOne(() => ClassRoom, (classRoom) => classRoom.questions, { onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'class_room_id' })
+  @JoinColumn({ name: 'classroom_id' })
   classroom: ClassRoom;
 
   @OneToMany(() => StudentAnswer, (studentAnswer) => studentAnswer.question)

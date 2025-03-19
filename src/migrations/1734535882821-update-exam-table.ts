@@ -8,8 +8,8 @@ export class UpdateExamTable1734535882821 implements MigrationInterface {
     columns: [
       MigrationConst.idPrimaryColumn,
       MigrationConst.createdAtColumn,
-      new TableColumn(MigrationConst.bigIntColumn('exam_id')),
-      new TableColumn(MigrationConst.bigIntColumn('question_id')),
+      new TableColumn(MigrationConst.intColumn('exam_id')),
+      new TableColumn(MigrationConst.intColumn('question_id')),
     ],
   });
 
@@ -20,7 +20,7 @@ export class UpdateExamTable1734535882821 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.renameColumn(EntityNameConst.EXAM, 'title', 'name');
     await queryRunner.addColumns(EntityNameConst.EXAM, [
-      new TableColumn(MigrationConst.bigIntColumn('number_of_questions', { default: 0 })),
+      new TableColumn(MigrationConst.intColumn('number_of_questions', { default: 0 })),
       new TableColumn(MigrationConst.booleanColumn('private', { default: false })),
     ]);
 

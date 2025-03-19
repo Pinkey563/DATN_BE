@@ -1,26 +1,21 @@
 import { EntityNameConst } from 'src/constant/entity-name';
 import { DBColumn } from 'src/decorator/swagger.decorator';
-import { PrimaryGeneratedColumn,Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, JoinColumn, ManyToOne } from 'typeorm';
 import { AbstractTimeEntity } from '../entity.interface';
 import { User } from '../user/user.entity';
 import { ClassRoom } from './classroom.entity';
-import { IsSwaggerNumber } from '../../decorator/swagger.decorator';
 
 @Entity(EntityNameConst.CLASS_STUDENT)
 export class ClassStudent extends AbstractTimeEntity {
-  @IsSwaggerNumber({ default: 1 })
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'class_student_id' }) // Định nghĩa ID mới
-  classStudentId: number;
-
   @DBColumn({
-    name: 'class_room_id',
-    type: 'bigint',
+    name: 'classroom_id',
+    type: 'int',
   })
   classroomId: number;
 
   @DBColumn({
-    name: 'user_id',
-    type: 'bigint',
+    name: 'student_id',
+    type: 'int',
   })
   studentId: number;
 
@@ -29,12 +24,12 @@ export class ClassStudent extends AbstractTimeEntity {
   @ManyToOne(() => ClassRoom, (classRoom) => classRoom.classStudents, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'class_room_id' })
+  @JoinColumn({ name: 'classroom_id' })
   classroom: ClassRoom;
 
   @ManyToOne(() => User, (User) => User.classStudents, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'student_id' })
   student: User;
 }

@@ -15,6 +15,6 @@ export const VocabularySummary: Record<keyof typeof VocabularyAction, string> = 
 };
 
 export const VocabularyPermission: Partial<Permission>[] = Object.keys(VocabularyAction).map((key) => ({
-  roleCode: VocabularyAction[key],
+  code: VocabularyAction[key],
   name: VocabularySummary[key],
 }));

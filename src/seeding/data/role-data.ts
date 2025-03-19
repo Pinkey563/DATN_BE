@@ -3,23 +3,23 @@ import { Role } from 'src/entities/role/role.entity';
 
 export const RoleData: Partial<Role>[] = [
   {
-    roleCode: RoleCode.ADMIN,
+    code: RoleCode.ADMIN,
     name: 'Administrators on system',
   },
   {
-    roleCode: RoleCode.TEACHER,
+    code: RoleCode.TEACHER,
     name: 'Teacher on system',
   },
   {
-    roleCode: RoleCode.STUDENT,
+    code: RoleCode.STUDENT,
     name: 'Student on system',
   },
   {
-    roleCode: RoleCode.VOLUNTEER,
+    code: RoleCode.VOLUNTEER,
     name: 'Volunteer on system',
   },
   {
-    roleCode: RoleCode.ADMIN_CODE_SERVICE,
+    code: RoleCode.ADMIN_CODE_SERVICE,
     name: 'Code server administrators on system',
   },
 ];

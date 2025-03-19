@@ -1,14 +1,10 @@
 import { EntityNameConst } from 'src/constant/entity-name';
-import { Column, Entity, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
-import { AbstractCreatedIdEntity } from '../entity.interface';
+import { Column, Entity, JoinColumn, ManyToOne } from 'typeorm';
+import { AbstractCreatedEntity } from '../entity.interface';
 import { User } from '../user/user.entity';
-import { IsSwaggerNumber } from '../../decorator/swagger.decorator';
-@Entity(EntityNameConst.UPLOAD)
-export class Upload extends AbstractCreatedIdEntity {
-  @IsSwaggerNumber({ default: 1 })
-  @PrimaryGeneratedColumn({ type: 'bigint', name: 'upload_id' }) // Định nghĩa ID mới
-  uploadId: number;
 
+@Entity(EntityNameConst.UPLOAD)
+export class Upload extends AbstractCreatedEntity {
   @Column({ primary: true, name: 'path', type: 'varchar', unique: true })
   path: string;
 

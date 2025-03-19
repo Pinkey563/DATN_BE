@@ -9,7 +9,7 @@ export class UpdateExamAttempt1734762441185 implements MigrationInterface {
   ];
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.addColumns(EntityNameConst.EXAM_ATTEMPT, [
-      new TableColumn(MigrationConst.decimal('score', { isNullable: true, precision: 10, scale: 2 })),
+      new TableColumn(MigrationConst.numeric('score', { isNullable: true, precision: 10, scale: 2 })),
       new TableColumn(MigrationConst.booleanColumn('is_finished', { default: false })),
     ]);
 
@@ -17,8 +17,8 @@ export class UpdateExamAttempt1734762441185 implements MigrationInterface {
     await queryRunner.createForeignKeys(EntityNameConst.STUDENT_ANSWER, this.StudentAnswerForeignKey);
     await queryRunner.changeColumns(EntityNameConst.STUDENT_ANSWER, [
       {
-        oldColumn: new TableColumn(MigrationConst.bigIntColumn('answer_id')),
-        newColumn: new TableColumn(MigrationConst.bigIntColumn('selected_answers', { isNullable: true, isArray: true })),
+        oldColumn: new TableColumn(MigrationConst.intColumn('answer_id')),
+        newColumn: new TableColumn(MigrationConst.intColumn('selected_answers', { isNullable: true, isArray: true })),
       },
     ]);
   }

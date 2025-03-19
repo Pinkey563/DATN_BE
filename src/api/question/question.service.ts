@@ -24,7 +24,7 @@ export class QuestionService {
   search = async (query: SearchQuestionDto): Promise<PageDto<Question>> => {
     const [data, itemCount] = await Question.findAndCount({
       select: {
-        questionId: true,
+        id: true,
         content: true,
         classRoomId: true,
         imageLocation: true,
@@ -33,17 +33,17 @@ export class QuestionService {
         createdAt: true,
         creatorId: true,
         classroom: {
-          classroomId: true,
+          id: true,
           name: true,
           classLevel: true,
         },
         answerResList: {
-          questionId: true,
+          id: true,
           content: true,
           correct: true,
           imageLocation: true,
           videoLocation: true,
-          // questionId: true,
+          questionId: true,
         },
       },
       where: QuestionHelper.getFilterSearchQuestion(query),
@@ -81,7 +81,7 @@ export class QuestionService {
       answerRep.correct = answer.correct;
       answerRep.imageLocation = answer.imageLocation;
       answerRep.videoLocation = answer.videoLocation;
-      answerRep.questionId = question.questionId;
+      answerRep.questionId = question.id;
 
       await answerRep.save();
     });
@@ -103,16 +103,16 @@ export class QuestionService {
     return questionList;
   };
 
-  getById = async (questionId: number): Promise<Question> => {
+  getById = async (id: number): Promise<Question> => {
     const question = await Question.findOne({
       select: {
         classroom: {
-          classroomId: true,
+          id: true,
           name: true,
           classLevel: true,
         },
         answerResList: {
-          // id: true,
+          id: true,
           content: true,
           correct: true,
           imageLocation: true,
@@ -120,15 +120,15 @@ export class QuestionService {
           questionId: true,
         },
       },
-      where: { questionId },
+      where: { id },
       relations: { classroom: true, answerResList: true },
     });
-    if (!question) throw new App404Exception('id', { questionId });
+    if (!question) throw new App404Exception('id', { id });
     return question;
   };
 
   updateById = async (
-    questionId: number,
+    id: number,
     user: CacheUser,
     body: UpdateQuestionDto,
     permissionCode: string,
@@ -136,7 +136,7 @@ export class QuestionService {
     const question = await Question.findOne({
       select: {
         answerResList: {
-          // id: true,
+          id: true,
           content: true,
           correct: true,
           imageLocation: true,
@@ -144,10 +144,10 @@ export class QuestionService {
           questionId: true,
         },
       },
-      where: { questionId },
+      where: { id },
       relations: { answerResList: true },
     });
-    if (!question) throw new App404Exception('id', { questionId });
+    if (!question) throw new App404Exception('id', { id });
 
     // if (body.content != question.content) {
     //   const isExistByName = await HelperUtils.existByName(Question, body.content, 'content');
@@ -179,9 +179,9 @@ export class QuestionService {
     if (!diffAnswer.length && !diffQuestion.length) throw new AppException(ERROR_MSG.HAVE_NOT_ANY_CHANGE);
 
     body.updateAnswerReqs.map(async (answer) => {
-      let answerRep = await Answer.findOne({ where: { answerId: answer.answerId } });
+      let answerRep = await Answer.findOne({ where: { id: answer.id } });
       if (!answerRep) answerRep = new Answer();
-      answerRep.questionId = question.questionId;
+      answerRep.questionId = question.id;
       CondUtil.saveIfChanged(answerRep, answer, ['content', 'correct', 'imageLocation', 'videoLocation']);
 
       await answerRep.save();
@@ -190,16 +190,16 @@ export class QuestionService {
     return await question.save();
   };
 
-  deleteById = async (questionId: number, user: CacheUser, permissionCode): Promise<any> => {
+  deleteById = async (id: number, user: CacheUser, permissionCode): Promise<any> => {
     let question;
     const userRole = await RoleHelper.getRoleByUserId(user.userId);
-    if (userRole.roleCode === 'ADMIN') {
-      question = await Question.findOne({ where: { questionId } });
+    if (userRole.code === 'ADMIN') {
+      question = await Question.findOne({ where: { id } });
     } else {
-      question = await Question.findOne({ where: { questionId, creatorId: user.userId } });
+      question = await Question.findOne({ where: { id, creatorId: user.userId } });
     }
 
-    if (!question) throw new App404Exception('id', { questionId });
+    if (!question) throw new App404Exception('id', { id });
 
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
@@ -212,9 +212,9 @@ export class QuestionService {
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
 
-    if (!questionIds.length) throw new App404Exception('id', { questionId: questionIds });
+    if (!questionIds.length) throw new App404Exception('id', { id: questionIds });
 
-    const questionList = await Question.find({ where: { questionId: In(questionIds) } });
+    const questionList = await Question.find({ where: { id: In(questionIds) } });
 
     await this.dataSource.transaction(async (txManager) => {
       for (let index = 0; index < questionList.length; index++) {
@@ -226,13 +226,13 @@ export class QuestionService {
     return true;
   };
 
-  deleteAnswers = async (answerId: number, user: CacheUser, permissionCode): Promise<any> => {
+  deleteAnswers = async (id: number, user: CacheUser, permissionCode): Promise<any> => {
     const isPermission = await PermissionHelper.isPermissionChange(user.userId, permissionCode);
     if (!isPermission) throw new App404Exception('permissionCode', { permissionCode });
 
-    const answer = await Answer.findOne({ where: { answerId } });
+    const answer = await Answer.findOne({ where: { id } });
 
-    if (!answer) throw new App404Exception('id', { answerId });
+    if (!answer) throw new App404Exception('id', { id });
 
     await answer.remove();
 
